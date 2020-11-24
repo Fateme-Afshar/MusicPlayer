@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/img_cover"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/shadow"
+            android:src="@drawable/ic_null_cover_img" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/music_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/img_cover"
+            android:layout_toRightOf="@+id/img_cover"
+            android:fontFamily="@font/segoe_ui_bold"
+            android:padding="@dimen/padding_5"
+            android:textColor="@color/beauty_red"
+            android:textSize="@dimen/text_size_15"
+            tools:text="@string/hint_music_name" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/singer_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/music_name"
+            android:layout_toEndOf="@+id/img_cover"
+            android:layout_toRightOf="@+id/img_cover"
+            android:fontFamily="@font/franklin_gothic_medium_regular"
+            android:padding="@dimen/padding_5"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_15"
+            tools:text="@string/hint_music_singer" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/song_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/music_name"
+            android:layout_alignParentRight="true"
+            android:fontFamily="@font/comici"
+            android:padding="@dimen/padding_5"
+            android:text="3:20"
+            android:textColor="@color/orange"
+            android:textSize="13sp" />
+
+    </RelativeLayout>
+</layout>
