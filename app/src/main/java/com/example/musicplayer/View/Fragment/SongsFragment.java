@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -13,13 +14,17 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.musicplayer.Adapter.MusicAdapter;
+import com.example.musicplayer.Model.Music;
 import com.example.musicplayer.R;
-import com.example.musicplayer.ViewModel.MusicPlayerViewModel;
-import com.example.musicplayer.databinding.RecyclerViewBinding;
+import com.example.musicplayer.Utils.ExtractFromPath;
+import com.example.musicplayer.viewModel.MusicPlayerViewModel;
+import com.example.musicplayer.databinding.MainViewBinding;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class SongsFragment extends Fragment {
     private MusicAdapter mAdapter;
-    private RecyclerViewBinding mBinding;
+    private MainViewBinding mBinding;
+    private BottomSheetBehavior mBehavior;
 
     private MusicPlayerViewModel mViewModel;
 
@@ -45,11 +50,58 @@ public class SongsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mBinding= DataBindingUtil.inflate(inflater,
-                R.layout.recycler_view,
+                R.layout.main_view,
                 container,
                 false);
+        setupBottomSheet();
         setupAdapter();
+
+        mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
+
+        mBinding.btnPlayBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v) {
+                mViewModel.playMusic();
+                mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
+                mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
+            }
+        });
+
+        mBinding.btnPauseBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mViewModel.pauseMusic();
+                mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
+                mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
+            }
+        });
         return mBinding.getRoot();
+    }
+
+    private void setupBottomSheet() {
+        mBehavior= BottomSheetBehavior.from(mBinding.bottomSheet);
+        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState==BottomSheetBehavior.STATE_EXPANDED) {
+                    mBinding.containerMusicInfo.setVisibility(View.GONE);
+                    mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
+                    mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
+                }
+                else {
+                    mBinding.containerMusicInfo.setVisibility(View.VISIBLE);
+                    mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
+                    mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -62,6 +114,23 @@ public class SongsFragment extends Fragment {
 
     private void setupAdapter(){
         mAdapter=new MusicAdapter(getContext());
+        mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public boolean sendMusicInfo(Music music) {
+                mViewModel.setMusic(music);
+                mBinding.singerNameBottomSheet.setText(music.getSingerName());
+                mBinding.songNameBottomSheet.setText(music.getName());
+            try {
+                mBinding.imgCoverBottomSheet.setImageBitmap(
+                        ExtractFromPath.getImgCoverSong(music.getPath()));
+            }catch (Exception e){
+                mBinding.imgCoverBottomSheet.setImageDrawable(
+                        getActivity().getResources().getDrawable(R.drawable.ic_null_cover_img));
+            }
+                return false;
+            }
+        });
         mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mBinding.recyclerView.setAdapter(mAdapter);
     }

@@ -9,6 +9,7 @@ public class Music {
         private String mName;
         private String mPath;
         private String mSingerName;
+        private int mDuration;
         private Bitmap mCoverImg;
 
     public Music() {
@@ -49,5 +50,13 @@ public class Music {
 
     public void setCoverImg(Bitmap coverImg) {
         mCoverImg = coverImg;
+    }
+
+    public int getDuration() {
+        return mDuration;
+    }
+
+    public void setDuration(int duration) {
+        mDuration = duration;
     }
 }

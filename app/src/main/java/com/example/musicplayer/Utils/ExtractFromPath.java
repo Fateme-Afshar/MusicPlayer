@@ -22,4 +22,12 @@ public class ExtractFromPath {
         String fullMusicName = nameSection[nameSection.length - 1];
         return fullMusicName.substring(0, fullMusicName.lastIndexOf("."));
     }
+
+    public static int getMusicDuration(String path) {
+        MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
+        metaRetriever.setDataSource(path);
+        return Integer.parseInt(metaRetriever.
+                extractMetadata(MediaMetadataRetriever.
+                        METADATA_KEY_DURATION));
+    }
 }

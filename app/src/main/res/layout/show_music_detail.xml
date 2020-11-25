@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/song_name_pager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_5"
+            android:text="Kode Hamoni Ke Mikhami"
+            android:fontFamily="@font/segoe_ui_bold"
+            android:textColor="@color/beauty_red"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/singer_name_pager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_5"
+            android:layout_below="@+id/song_name_pager"
+            android:fontFamily="@font/comici"
+            android:text="kamran homan"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+        <ImageView
+            android:id="@+id/img_cover_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_cover_img"
+            />
+
+        <RelativeLayout
+            android:id="@+id/music_progress_view_group"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:background="@color/white"
+            android:layout_alignParentBottom="true"
+            >
+
+            <SeekBar
+                android:id="@+id/seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_5"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_play"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/seekbar"
+                android:src="@drawable/ic_play"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="@dimen/margin_10"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_pause"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/seekbar"
+                android:src="@drawable/ic_pause"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="@dimen/margin_10"
+                />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_next"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/seekbar"
+                android:layout_alignLeft="@+id/btn_pause"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="62dp"
+                android:layout_marginTop="@dimen/margin_5"
+                android:layout_marginBottom="@dimen/margin_10"
+                android:src="@drawable/ic_next" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/btn_prev"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/seekbar"
+                android:layout_alignRight="@+id/btn_pause"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="@dimen/margin_5"
+                android:layout_marginRight="62dp"
+                android:layout_marginBottom="@dimen/margin_10"
+                android:src="@drawable/ic_prev" />
+
+        </RelativeLayout>
+    </RelativeLayout>
+</layout>

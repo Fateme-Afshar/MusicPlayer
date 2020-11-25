@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 
 import com.example.musicplayer.Adapter.MusicPagerAdapter;
 import com.example.musicplayer.R;
-import com.example.musicplayer.ViewModel.MusicPlayerViewModel;
+import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.example.musicplayer.databinding.FragmentPagerBinding;
 import com.google.android.material.tabs.TabLayoutMediator;
 

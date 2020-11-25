@@ -64,7 +64,6 @@ public class MusicRepository {
             music.setPath(cursor.getString(songPath));
             music.setName(cursor.getString(songName));
             music.setSingerName(cursor.getString(songSingerName));
-
             musicList.add(music);
         }
 

@@ -1,7 +1,6 @@
 package com.example.musicplayer.Adapter;
 
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.view.LayoutInflater;
@@ -68,7 +67,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
                 }else
                     mMediaPlayer.stop();
 */
-                mCallback.sendMusicInfo(mMusicList.get(position).getPath());
+             mCallback.sendMusicInfo(mMusicList.get(position));
             }
         });
     }
@@ -88,21 +87,17 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
             super(binding.getRoot());
 
             mBinding = binding;
-
         }
 
         @RequiresApi(api = Build.VERSION_CODES.N)
         public void bind(Music music) {
             mMusic = music;
-          createMediaPlayer(mMusic.getPath());
-            mBinding.musicName.setText(mMusic.getName());
-            if (mMusic.getSingerName().length() < 20)
-                mBinding.singerName.setText(mMusic.getSingerName());
-            else if (mMusic.getSingerName().length() >=20) {
-                String singerName = mMusic.getSingerName().substring(0, 19);
+            createMediaPlayer(mMusic.getPath());
+            mBinding.musicName.setText(getNormalText(mMusic.getName()));
+            mBinding.singerName.setText(getNormalText(mMusic.getSingerName()));
 
-                mBinding.singerName.setText(singerName+"...");
-            }
+            music.setDuration(ExtractFromPath.getMusicDuration(music.getPath()));
+            mBinding.songTime.setText(extractMusicDurationToTimeFormat());
 
             try {
                 mBinding.imgCover.setImageBitmap(ExtractFromPath.getImgCoverSong(mMusic.getPath()));
@@ -112,16 +107,18 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
             }
         }
 
+        private String getNormalText(String text) {
+            if (text.length() >= 20) {
+                String singerName = text.substring(0, 19);
+                return singerName + "...";
+            }
+            return text;
+        }
+
         @RequiresApi(api = Build.VERSION_CODES.N)
         private void createMediaPlayer(String path) {
-            mMediaPlayer=new MediaPlayer();
+            mMediaPlayer = new MediaPlayer();
             try {
-                MediaMetadataRetriever metaRetriever = new MediaMetadataRetriever();
-                metaRetriever.setDataSource(mMusic.getPath());
-                // convert duration to minute:seconds
-                String duration =
-                        metaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                mBinding.songTime.setText(duration);
                 mMediaPlayer.setDataSource(path);
                 mMediaPlayer.prepare();
                 mMediaPlayer.setVolume(0.5f, 0.5f);
@@ -131,9 +128,19 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
                 e.printStackTrace();
             }
         }
+
+        private String extractMusicDurationToTimeFormat() {
+            int second = (mMusic.getDuration()/1000);
+            int minute = second / 60;
+            int hour = minute / 60;
+
+            if (hour != 0)
+                return hour + " : " + minute + " : " + second%60;
+            return minute + " : " + second%60;
+        }
     }
 
     public interface MusicAdapterCallback {
-        boolean sendMusicInfo(String path);
+        boolean sendMusicInfo(Music music);
     }
 }

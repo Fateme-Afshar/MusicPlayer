@@ -6,6 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".View.Fragment.SongsFragment">
 
-    <include layout="@layout/recycler_view"/>
+    <include layout="@layout/main_view"/>
 
 </FrameLayout>
