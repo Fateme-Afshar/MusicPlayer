@@ -137,4 +137,10 @@ public class SongsFragment extends Fragment {
         mBinding.recyclerView.setAdapter(mAdapter);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mViewModel.releaseMediaPlayer();
+    }
 }

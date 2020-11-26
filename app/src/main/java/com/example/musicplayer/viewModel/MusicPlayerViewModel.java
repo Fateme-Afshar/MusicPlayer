@@ -82,4 +82,8 @@ public class MusicPlayerViewModel extends AndroidViewModel {
             mMediaPlayer.stop();
     }
 
+    public void releaseMediaPlayer(){
+        mMediaPlayer.release();
+        mMediaPlayer=null;
+    }
 }

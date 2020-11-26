@@ -34,7 +34,9 @@ public class MusicRepository {
         if (songCursorEXTERNAL != null) {
             musicList.addAll(getInfoFromCursor(songCursorEXTERNAL));
         }
-            return musicList;
+
+        songCursorEXTERNAL.close();
+        return musicList;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
