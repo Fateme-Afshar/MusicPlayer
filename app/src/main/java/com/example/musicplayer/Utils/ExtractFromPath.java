@@ -1,5 +1,6 @@
 package com.example.musicplayer.Utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
@@ -8,13 +9,16 @@ import java.io.File;
 
 public class ExtractFromPath {
 
-    public static Bitmap getImgCoverSong(String songPath) {
+    public static Bitmap getImgCoverSong(String songPath, Context context) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(songPath);
         byte[] art = retriever.getEmbeddedPicture();
 
-        return BitmapFactory
-                .decodeByteArray(art, 0, art.length);
+        return Bitmap.createScaledBitmap(BitmapFactory
+                .decodeByteArray(art, 0, art.length),
+                120,
+                120,
+                false);
     }
 
     public static String getMusicName(String path) {

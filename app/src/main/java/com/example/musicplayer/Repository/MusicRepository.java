@@ -47,6 +47,7 @@ public class MusicRepository {
         int songName = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
         int songSingerName = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
         int songPath = cursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+        int albumId=cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
 
         while (cursor.moveToNext()) {
             Music music = new Music();
@@ -54,6 +55,7 @@ public class MusicRepository {
             music.setPath(cursor.getString(songPath));
             music.setName(cursor.getString(songName));
             music.setSingerName(cursor.getString(songSingerName));
+            music.setAlbumId(cursor.getInt(albumId));
             musicList.add(music);
         }
 

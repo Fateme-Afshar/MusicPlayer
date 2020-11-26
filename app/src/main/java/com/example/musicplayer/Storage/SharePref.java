@@ -25,7 +25,7 @@ public class SharePref {
     private static SharedPreferences getSharedPreferences(Context leekSafeContext) {
         return leekSafeContext.
                 getSharedPreferences(
-                        "com.example.musicplayer",
+                        leekSafeContext.getPackageName(),
                         Context.MODE_PRIVATE);
     }
 }

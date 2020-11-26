@@ -10,7 +10,7 @@ public class Music {
         private String mPath;
         private String mSingerName;
         private int mDuration;
-        private Bitmap mCoverImg;
+        private int mAlbumId;
 
     public Music() {
         mId=UUID.randomUUID();
@@ -44,12 +44,12 @@ public class Music {
         mSingerName = singerName;
     }
 
-    public Bitmap getCoverImg() {
-        return mCoverImg;
+    public int getAlbumId() {
+        return mAlbumId;
     }
 
-    public void setCoverImg(Bitmap coverImg) {
-        mCoverImg = coverImg;
+    public void setAlbumId(int albumId) {
+        mAlbumId = albumId;
     }
 
     public int getDuration() {

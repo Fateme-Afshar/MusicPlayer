@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.musicplayer.Adapter.MusicAdapter;
 import com.example.musicplayer.Model.Music;
 import com.example.musicplayer.R;
+import com.example.musicplayer.Storage.SharePref;
 import com.example.musicplayer.Utils.ExtractFromPath;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.example.musicplayer.databinding.MainViewBinding;
@@ -124,12 +125,21 @@ public class SongsFragment extends Fragment {
                 mBinding.singerNameBottomSheet.setText(music.getSingerName());
                 mBinding.songNameBottomSheet.setText(music.getName());
                 try {
-                    mBinding.imgCoverBottomSheet.setImageBitmap(
-                            ExtractFromPath.getImgCoverSong(music.getPath()));
+
                 } catch (Exception e) {
                     mBinding.imgCoverBottomSheet.setImageDrawable(
                             getActivity().getResources().getDrawable(R.drawable.ic_null_cover_img));
                 }
+
+                if ( SharePref.getStateMusic(getContext())==null ||
+                        SharePref.getStateMusic(getContext()).equals(null) ||
+                        SharePref.getStateMusic(getContext()).equals("pause")
+                       ){
+                    mViewModel.playMusic();
+                SharePref.setStateMusic(getContext(),"play");
+                }
+                else
+                    mViewModel.pauseMusic();
                 return false;
             }
         });
