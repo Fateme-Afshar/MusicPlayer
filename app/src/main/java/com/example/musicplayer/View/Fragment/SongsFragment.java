@@ -1,5 +1,6 @@
 package com.example.musicplayer.View.Fragment;
 
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +21,8 @@ import com.example.musicplayer.Utils.ExtractFromPath;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.example.musicplayer.databinding.MainViewBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import java.io.IOException;
 
 public class SongsFragment extends Fragment {
     private MusicAdapter mAdapter;
@@ -42,14 +45,14 @@ public class SongsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel=new ViewModelProvider(this).get(MusicPlayerViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MusicPlayerViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mBinding= DataBindingUtil.inflate(inflater,
+        mBinding = DataBindingUtil.inflate(inflater,
                 R.layout.main_view,
                 container,
                 false);
@@ -80,17 +83,16 @@ public class SongsFragment extends Fragment {
     }
 
     private void setupBottomSheet() {
-        mBehavior= BottomSheetBehavior.from(mBinding.bottomSheet);
+        mBehavior = BottomSheetBehavior.from(mBinding.bottomSheet);
         mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState==BottomSheetBehavior.STATE_EXPANDED) {
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     mBinding.containerMusicInfo.setVisibility(View.GONE);
                     mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
                     mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
-                }
-                else {
+                } else {
                     mBinding.containerMusicInfo.setVisibility(View.VISIBLE);
                     mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
                     mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
@@ -108,12 +110,12 @@ public class SongsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-            if (mAdapter.getMusicNameList().size()==0)
-                mAdapter.setMusicNameList(mViewModel.getMusics());
+        if (mAdapter.getMusicNameList().size() == 0)
+            mAdapter.setMusicNameList(mViewModel.getMusics());
     }
 
-    private void setupAdapter(){
-        mAdapter=new MusicAdapter(getContext());
+    private void setupAdapter() {
+        mAdapter = new MusicAdapter(getContext());
         mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -121,17 +123,18 @@ public class SongsFragment extends Fragment {
                 mViewModel.setMusic(music);
                 mBinding.singerNameBottomSheet.setText(music.getSingerName());
                 mBinding.songNameBottomSheet.setText(music.getName());
-            try {
-                mBinding.imgCoverBottomSheet.setImageBitmap(
-                        ExtractFromPath.getImgCoverSong(music.getPath()));
-            }catch (Exception e){
-                mBinding.imgCoverBottomSheet.setImageDrawable(
-                        getActivity().getResources().getDrawable(R.drawable.ic_null_cover_img));
-            }
+                try {
+                    mBinding.imgCoverBottomSheet.setImageBitmap(
+                            ExtractFromPath.getImgCoverSong(music.getPath()));
+                } catch (Exception e) {
+                    mBinding.imgCoverBottomSheet.setImageDrawable(
+                            getActivity().getResources().getDrawable(R.drawable.ic_null_cover_img));
+                }
                 return false;
             }
         });
         mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mBinding.recyclerView.setAdapter(mAdapter);
     }
+
 }

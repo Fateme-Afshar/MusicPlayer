@@ -1,7 +1,7 @@
 package com.example.musicplayer.Adapter;
 
 import android.content.Context;
-import android.media.MediaPlayer;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,6 @@ import com.example.musicplayer.R;
 import com.example.musicplayer.Utils.ExtractFromPath;
 import com.example.musicplayer.databinding.ItemMusicBinding;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,12 +60,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*if (!isStarted){
-                    mMediaPlayer.start();
-                    isStarted=true;
-                }else
-                    mMediaPlayer.stop();
-*/
              mCallback.sendMusicInfo(mMusicList.get(position));
             }
         });
@@ -79,7 +72,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
 
     class Holder extends RecyclerView.ViewHolder {
         private Music mMusic = new Music();
-        private MediaPlayer mMediaPlayer;
 
         private ItemMusicBinding mBinding;
 
@@ -92,7 +84,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
         @RequiresApi(api = Build.VERSION_CODES.N)
         public void bind(Music music) {
             mMusic = music;
-            createMediaPlayer(mMusic.getPath());
             mBinding.musicName.setText(getNormalText(mMusic.getName()));
             mBinding.singerName.setText(getNormalText(mMusic.getSingerName()));
 
@@ -100,7 +91,22 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
             mBinding.songTime.setText(extractMusicDurationToTimeFormat());
 
             try {
-                mBinding.imgCover.setImageBitmap(ExtractFromPath.getImgCoverSong(mMusic.getPath()));
+                //------ scaling bitmap -----
+
+                mBinding.imgCover.setImageBitmap(Bitmap.
+                        createScaledBitmap(
+                                ExtractFromPath.getImgCoverSong(music.getPath()),
+                                mBinding.imgCover.getWidth(),
+                                mBinding.imgCover.getHeight(),
+                                false));
+
+/*                mBinding.imgCover.setImageBitmap(
+                        PhotoUtils.getResizedBitmap(
+                                ExtractFromPath.getImgCoverSong(
+                                        music.getPath()),
+                                mBinding.imgCover.getWidth(),
+                                mBinding.imgCover.getHeight()));*/
+
             } catch (Exception e) {
                 mBinding.imgCover.setImageDrawable(
                         mContext.getResources().getDrawable(R.drawable.ic_null_cover_img));
@@ -113,20 +119,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> {
                 return singerName + "...";
             }
             return text;
-        }
-
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        private void createMediaPlayer(String path) {
-            mMediaPlayer = new MediaPlayer();
-            try {
-                mMediaPlayer.setDataSource(path);
-                mMediaPlayer.prepare();
-                mMediaPlayer.setVolume(0.5f, 0.5f);
-                mMediaPlayer.setLooping(false);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         private String extractMusicDurationToTimeFormat() {

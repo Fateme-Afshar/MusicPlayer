@@ -10,7 +10,6 @@ import android.provider.MediaStore;
 import androidx.annotation.RequiresApi;
 
 import com.example.musicplayer.Model.Music;
-import com.example.musicplayer.Utils.ExtractFromPath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,6 @@ public class MusicRepository {
 
         ContentResolver contentResolver = leakSafeContext.getContentResolver();
         Uri songUriFromEXTERNAL = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Uri songUriFromINTERNAL = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
 
         Cursor songCursorEXTERNAL = contentResolver.
                 query(songUriFromEXTERNAL,
@@ -32,19 +30,9 @@ public class MusicRepository {
                         null,
                         null,
                         null);
-        Cursor songCursorINTERNAL = contentResolver.
-                query(songUriFromINTERNAL,
-                        null,
-                        null,
-                        null,
-                        null);
 
         if (songCursorEXTERNAL != null) {
             musicList.addAll(getInfoFromCursor(songCursorEXTERNAL));
-        }
-
-        if (songCursorINTERNAL !=null){
-            musicList.addAll(getInfoFromCursor(songCursorINTERNAL));
         }
             return musicList;
     }

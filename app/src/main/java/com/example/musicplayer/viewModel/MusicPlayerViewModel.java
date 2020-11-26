@@ -81,4 +81,5 @@ public class MusicPlayerViewModel extends AndroidViewModel {
     public void pauseMusic() {
             mMediaPlayer.stop();
     }
+
 }
