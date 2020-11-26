@@ -1,4 +1,4 @@
-package com.example.musicplayer.Storeg;
+package com.example.musicplayer.Storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
