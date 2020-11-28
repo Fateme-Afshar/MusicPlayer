@@ -18,11 +18,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.musicplayer.Adapter.MusicAdapter;
-import com.example.musicplayer.Storage.SharePref;
-import com.example.musicplayer.model.Music;
 import com.example.musicplayer.R;
-import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.example.musicplayer.databinding.MainViewBinding;
+import com.example.musicplayer.model.Music;
+import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class SongsFragment extends Fragment {
@@ -75,13 +74,13 @@ public class SongsFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return false;
+                mAdapter.getFilter().filter(query);
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 mAdapter.getFilter().filter(newText);
-                setupAdapter();
                 return false;
             }
         });
@@ -113,24 +112,25 @@ public class SongsFragment extends Fragment {
 
     private void setupAdapter() {
         if (mAdapter==null) {
-            mAdapter = new MusicAdapter(getContext());
+            mAdapter = new MusicAdapter(getContext(), mViewModel);
             mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
                 @RequiresApi(api = Build.VERSION_CODES.N)
                 @Override
                 public void sendMusicInfo(Music music) {
                     mViewModel.setMusic(music);
-                    if (SharePref.getStateMusic(getContext())) {
-                        mViewModel.pauseMusic();
-                        SharePref.setStateMusic(getContext(),false);
-                    }
-                    mViewModel.setMusicImg(mBinding.imgCoverBottomSheet);
+
+                    mViewModel.setCoverImg(music.getAlbumId(),
+                            mBinding.imgCoverBottomSheet);
+
                     mBinding.setViewModel(mViewModel);
 
-                }
-
-                @Override
-                public void playMusic(Music music) {
-
+                    if (music.isPlaying()) {
+                        mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
+                        mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
+                    } else {
+                        mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
+                        mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
+                    }
                 }
             });
             mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -1,8 +1,6 @@
 package com.example.musicplayer.Adapter;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,24 +13,26 @@ import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.R;
-import com.example.musicplayer.Utils.ExtractFromPath;
 import com.example.musicplayer.databinding.ItemMusicBinding;
+import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> implements Filterable {
     private final List<Music> mMusicList = new ArrayList<>();
-    private final List<Music> mSearchMusicList = new ArrayList<>();
+
+    private  List<Music> mSearchResults;
 
     private Context mContext;
 
     private MusicAdapterCallback mCallback;
 
     private ItemMusicBinding mBinding;
+
+    private MusicPlayerViewModel mViewModel;
 
     public void setCallback(MusicAdapterCallback callback) {
         mCallback = callback;
@@ -44,17 +44,24 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
 
     public void setMusicNameList(List<Music> musicList) {
         mMusicList.addAll(musicList);
+        mSearchResults=new ArrayList<>(musicList);
     }
 
-    public MusicAdapter(Context context) {
+    public MusicAdapter(Context context,MusicPlayerViewModel viewModel) {
         mContext = context.getApplicationContext();
+        mViewModel=viewModel;
     }
+
 
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        mBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.item_music, parent, false);
-
+        mBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(mContext),
+                R.layout.item_music,
+                parent,
+                false);
+        mBinding.setViewModel(mViewModel);
         return new Holder(mBinding);
     }
 
@@ -65,9 +72,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             mCallback.sendMusicInfo(mMusicList.get(position));
+                mCallback.sendMusicInfo(mMusicList.get(position));
 
-             mCallback.playMusic(mMusicList.get(position));
+                mViewModel.checkPlayPauseMusic(mMusicList.get(position));
             }
         });
     }
@@ -77,19 +84,41 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
         return mMusicList.size();
     }
 
+    class Holder extends RecyclerView.ViewHolder {
+        private ItemMusicBinding mBinding;
+
+        public Holder(@NonNull ItemMusicBinding binding) {
+            super(binding.getRoot());
+            mBinding = binding;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        public void bind(Music music) {
+
+            mViewModel.setCoverImg(music.getAlbumId(),mBinding.imgCover);
+            //TODO: I think this way to set duration is heavy , so what is true way?
+            music.setDuration(music.getPath());
+            mBinding.setMusic(music);
+        }
+    }
+    public interface MusicAdapterCallback {
+        void sendMusicInfo(Music music);
+    }
+
     private Filter mFilter=new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             List<Music> filterList=new ArrayList<>();
 
-            if (constraint==null)
-                mSearchMusicList.addAll(mMusicList);
+            if (constraint==null || constraint.length()==0)
+                filterList.addAll(mSearchResults);
             else {
                 String pattern=constraint.toString().toLowerCase().trim();
 
-                for (Music music : mMusicList) {
-                    if (music.getName().contains(pattern))
-                            filterList.add(music);
+                for (Music music : mSearchResults) {
+                    if (music.getName().contains(pattern) ||
+                            music.getSingerName().contains(pattern))
+                        filterList.add(music);
                 }
             }
 
@@ -97,76 +126,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
             filterResults.values=filterList;
             return filterResults;
         }
-
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-                mMusicList.clear();
-                mMusicList.addAll((List<Music>) results.values);
-                notifyDataSetChanged();
+            mMusicList.clear();
+            mMusicList.addAll((List<Music>) results.values);
+            notifyDataSetChanged();
         }
     };
 
     @Override
     public Filter getFilter() {
         return mFilter;
-    }
-
-    class Holder extends RecyclerView.ViewHolder {
-        private Music mMusic = new Music();
-
-        private ItemMusicBinding mBinding;
-
-        public Holder(@NonNull ItemMusicBinding binding) {
-            super(binding.getRoot());
-
-            mBinding = binding;
-        }
-
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        public void bind(Music music) {
-            mMusic = music;
-
-            music.setDuration(ExtractFromPath.getMusicDuration(music.getPath())+"");
-            mBinding.setMusic(music);
-
-
-
-                //------ scaling bitmap -----
-               Uri sArtworkUri = Uri
-                        .parse("content://media/external/audio/albumart");
-
-                Uri uri = ContentUris.withAppendedId(sArtworkUri,
-                        mMusic.getAlbumId());
-                if (uri!=null)
-                    Glide.with(mContext).
-                            load(uri).
-                            centerCrop().
-                            placeholder(R.drawable.ic_null_cover_img)
-                            .into(mBinding.imgCover);
-
-        }
-
-        private String getNormalText(String text) {
-            if (text.length() >= 20) {
-                String singerName = text.substring(0, 19);
-                return singerName + "...";
-            }
-            return text;
-        }
-
-        private String extractMusicDurationToTimeFormat() {
-            int second = (Integer.parseInt(mMusic.getDuration())/1000);
-            int minute = second / 60;
-            int hour = minute / 60;
-
-            if (hour != 0)
-                return hour + " : " + minute + " : " + second%60;
-            return minute + " : " + second%60;
-        }
-    }
-
-    public interface MusicAdapterCallback {
-        void sendMusicInfo(Music music);
-        void playMusic(Music music);
     }
 }

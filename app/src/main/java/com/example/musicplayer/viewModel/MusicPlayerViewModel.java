@@ -11,13 +11,11 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.databinding.Bindable;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.bumptech.glide.Glide;
 import com.example.musicplayer.R;
 import com.example.musicplayer.Repository.MusicRepository;
-import com.example.musicplayer.Storage.SharePref;
 import com.example.musicplayer.model.Music;
 
 import java.io.IOException;
@@ -25,20 +23,8 @@ import java.util.List;
 
 
 public class MusicPlayerViewModel extends AndroidViewModel {
-    private MusicRepository mRepository;
-    private MediaPlayer mMediaPlayer;
     private Music mMusic;
-
-    public Music getMusic() {
-        return mMusic;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void setMusic(Music music) {
-        mMusic = music;
-        mMediaPlayer = createMediaPlayer(mMusic.getPath());
-    }
-
+    private MediaPlayer mMediaPlayer;
 
     public final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -47,12 +33,6 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
     public MusicPlayerViewModel(@NonNull Application application) {
         super(application);
-        mRepository = new MusicRepository();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    public List<Music> getMusics(){
-        return MusicRepository.getMusics(getApplication());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -62,6 +42,19 @@ public class MusicPlayerViewModel extends AndroidViewModel {
                 return true;
         }
         return false;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public List<Music> getMusics(){
+        return MusicRepository.getMusics(getApplication());
+    }
+
+    public Music getMusic() {
+        return mMusic;
+    }
+
+    public void setMusic(Music music) {
+        mMusic = music;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -80,41 +73,56 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         return null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void playMusic() {
-        assert mMediaPlayer != null;
-        mMediaPlayer.start();
-
-        SharePref.setStateMusic(getApplication(), true);
-    }
-
-    public void pauseMusic() {
-        mMediaPlayer.stop();
-        SharePref.setStateMusic(getApplication(), true);
-    }
-
-    public void releaseMediaPlayer() {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.release();
-            mMediaPlayer = null;
+    public String getNormalText(String text,int textLength) {
+        if (text.length() >= textLength) {
+            String singerName = text.substring(0, 19);
+            return singerName + "...";
         }
-            SharePref.setStateMusic(getApplication(),false);
+        return text;
     }
 
-    public void setMusicImg(ImageView imageView) {
+    public String extractMusicDurationToTimeFormat(int musicDuration) {
+        int second = (musicDuration/1000);
+        int minute = second / 60;
+        int hour = minute / 60;
+
+        if (hour != 0)
+            return hour + " : " + minute + " : " + second%60;
+        return minute + " : " + second%60;
+    }
+
+    public void setCoverImg(int albumId, ImageView view){
         Uri sArtworkUri = Uri
                 .parse("content://media/external/audio/albumart");
+        Uri uri= ContentUris.withAppendedId(sArtworkUri,albumId);
 
-        Uri uri = ContentUris.withAppendedId(sArtworkUri,
-                mMusic.getAlbumId());
         Glide.with(getApplication()).
                 load(uri).
                 centerCrop().
                 placeholder(R.drawable.ic_null_cover_img).
-                into(imageView);
+                into(view);
+
     }
 
-    public boolean getMusicState() {
-        return SharePref.getStateMusic(getApplication());
+    /**
+     * this method check {@music.isPlaying()} if music playing , pause music else play music
+     * @param music
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void checkPlayPauseMusic(Music music){
+        mMediaPlayer=new MediaPlayer();
+        mMediaPlayer=createMediaPlayer(music.getPath());
+        if (!mMusic.isPlaying()){
+            mMusic.setPlaying(true);
+            mMediaPlayer.start();
+        }else {
+            mMediaPlayer.pause();
+            mMusic.setPlaying(false);
+        }
+    }
+
+    public void releaseMediaPlayer(){
+        mMediaPlayer.release();
+        mMediaPlayer=null;
     }
 }

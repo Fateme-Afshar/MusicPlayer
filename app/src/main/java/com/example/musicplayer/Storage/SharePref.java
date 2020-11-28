@@ -8,7 +8,7 @@ import androidx.databinding.Bindable;
 
 import java.util.Observable;
 
-public class SharePref extends BaseObservable {
+public class SharePref{
     public static final String KEY_STATE_MUSIC = "stateMusic";
 
     public static boolean getStateMusic(Context context) {
@@ -18,7 +18,6 @@ public class SharePref extends BaseObservable {
                 getBoolean(KEY_STATE_MUSIC,false);
     }
 
-    @Bindable
     public static void setStateMusic(Context context, boolean state){
         Context leekSafeContext = context.getApplicationContext();
 

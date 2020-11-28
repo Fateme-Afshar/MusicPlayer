@@ -4,27 +4,10 @@
     >
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/song_name_pager"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_5"
-            android:text="Kode Hamoni Ke Mikhami"
-            android:fontFamily="@font/segoe_ui_bold"
-            android:textColor="@color/beauty_red"
-            android:textSize="15sp" />
+        android:layout_height="match_parent"
+        android:background="#fff"
+        >
 
-        <TextView
-            android:id="@+id/singer_name_pager"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_5"
-            android:layout_below="@+id/song_name_pager"
-            android:fontFamily="@font/comici"
-            android:text="kamran homan"
-            android:textColor="@color/black"
-            android:textSize="15sp" />
         <ImageView
             android:id="@+id/img_cover_background"
             android:layout_width="match_parent"

@@ -32,65 +32,72 @@
             app:behavior_peekHeight="70dp"
             android:fillViewport="true">
 
-            <include
-                layout="@layout/show_music_detail" />
+            <RelativeLayout
+                android:id="@+id/container_music_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/beauty_yellow"
+                android:layout_gravity="bottom"
+                android:background="@color/design_default_color_on_primary"
+                android:orientation="horizontal">
 
+                <ImageView
+                    android:id="@+id/img_cover_bottom_sheet"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    tools:src="@drawable/kamranhoman"
+                    />
+
+                    <TextView
+                        android:id="@+id/song_name_bottom_sheet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toEndOf="@+id/img_cover_bottom_sheet"
+                        android:layout_toRightOf="@+id/img_cover_bottom_sheet"
+                        tools:text="@string/hint_music_name"
+                        android:text="@{viewModel.getNormalText(viewModel.music.name,30)}"
+                        android:fontFamily="@font/segoe_ui_bold"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/singer_name_bottom_sheet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_below="@+id/song_name_bottom_sheet"
+                        android:layout_toEndOf="@+id/img_cover_bottom_sheet"
+                        android:layout_toRightOf="@+id/img_cover_bottom_sheet"
+                        android:fontFamily="@font/comici"
+                        tools:text="@string/hint_music_singer"
+                        android:text="@{viewModel.getNormalText(viewModel.music.singerName,20)}"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+                <include layout="@layout/show_music_detail"
+                    android:layout_below="@+id/img_cover_bottom_sheet"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="10dp"
+
+                    />
+            </RelativeLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <LinearLayout
-            android:id="@+id/container_music_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/beauty_yellow"
-            android:layout_gravity="bottom"
-            android:background="@color/design_default_color_on_primary"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/img_cover_bottom_sheet"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                tools:src="@drawable/kamranhoman"
-                android:layout_gravity="bottom" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/song_name_bottom_sheet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="@{viewModel.music.name}"
-                    android:fontFamily="@font/segoe_ui_bold"
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/singer_name_bottom_sheet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="5dp"
-                    android:fontFamily="@font/comici"
-                    android:text="@{viewModel.music.singerName}"
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-            </LinearLayout>
-        </LinearLayout>
 
         <ImageView
             android:id="@+id/btn_play_bottom_sheet"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_play"
             android:layout_gravity="bottom|right"
             android:layout_margin="10dp"
-            android:onClick="@{()->viewModel.playMusic()}"
-            android:visibility="@{viewModel.musicState ? View.GONE : View.VISIBLE}" />
+            android:src="@drawable/ic_play"
+            app:layout_anchor="@+id/btn_pause_bottom_sheet"
+            app:layout_anchorGravity="center"
+            android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
+            android:visibility="@{viewModel.music.isPlaying() ? View.GONE : View.VISIBLE}"
+            />
 
         <ImageView
             android:id="@+id/btn_pause_bottom_sheet"
@@ -99,7 +106,8 @@
             android:layout_gravity="bottom|right"
             android:layout_margin="10dp"
             android:src="@drawable/ic_pause"
-            android:onClick="@{()->viewModel.pauseMusic()}"
-            android:visibility="@{!viewModel.musicState ? View.GONE : View.VISIBLE}" />
+            android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
+            android:visibility="@{viewModel.music.isPlaying() ? View.VISIBLE : View.GONE}"
+            />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

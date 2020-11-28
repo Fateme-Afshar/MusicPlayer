@@ -3,6 +3,7 @@ package com.example.musicplayer.Repository;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -50,12 +51,12 @@ public class MusicRepository {
         int albumId=cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
 
         while (cursor.moveToNext()) {
-            Music music = new Music();
 
-            music.setPath(cursor.getString(songPath));
-            music.setName(cursor.getString(songName));
-            music.setSingerName(cursor.getString(songSingerName));
-            music.setAlbumId(cursor.getInt(albumId));
+            Music music = new Music(cursor.getString(songName)
+            ,cursor.getString(songSingerName)
+            ,cursor.getString(songPath)
+            ,cursor.getInt(albumId));
+
             musicList.add(music);
         }
 
