@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-<data>
-    <variable
-        name="viewModel"
-        type="com.example.musicplayer.viewModel.MusicPlayerViewModel" />
-</data>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.example.musicplayer.viewModel.MusicPlayerViewModel" />
+
+    </data>
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -43,7 +50,7 @@
                 android:id="@+id/img_cover_bottom_sheet"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
-                android:src="@drawable/kamranhoman"
+                tools:src="@drawable/kamranhoman"
                 android:layout_gravity="bottom" />
 
             <LinearLayout
@@ -57,7 +64,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:text="Kode Hamoni Ke Mikhami"
+                    android:text="@{viewModel.music.name}"
                     android:fontFamily="@font/segoe_ui_bold"
                     android:textColor="@color/black"
                     android:textSize="15sp" />
@@ -69,7 +76,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="5dp"
                     android:fontFamily="@font/comici"
-                    android:text="kamran homan"
+                    android:text="@{viewModel.music.singerName}"
                     android:textColor="@color/black"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -82,7 +89,8 @@
             android:src="@drawable/ic_play"
             android:layout_gravity="bottom|right"
             android:layout_margin="10dp"
-            />
+            android:onClick="@{()->viewModel.playMusic()}"
+            android:visibility="@{viewModel.musicState ? View.GONE : View.VISIBLE}" />
 
         <ImageView
             android:id="@+id/btn_pause_bottom_sheet"
@@ -91,6 +99,7 @@
             android:layout_gravity="bottom|right"
             android:layout_margin="10dp"
             android:src="@drawable/ic_pause"
-            />
+            android:onClick="@{()->viewModel.pauseMusic()}"
+            android:visibility="@{!viewModel.musicState ? View.GONE : View.VISIBLE}" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

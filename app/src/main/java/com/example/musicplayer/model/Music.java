@@ -1,6 +1,4 @@
-package com.example.musicplayer.Model;
-
-import android.graphics.Bitmap;
+package com.example.musicplayer.model;
 
 import java.util.UUID;
 
@@ -9,7 +7,7 @@ public class Music {
         private String mName;
         private String mPath;
         private String mSingerName;
-        private int mDuration;
+        private String mDuration;
         private int mAlbumId;
 
     public Music() {
@@ -52,11 +50,11 @@ public class Music {
         mAlbumId = albumId;
     }
 
-    public int getDuration() {
+    public String getDuration() {
         return mDuration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(String duration) {
         mDuration = duration;
     }
 }

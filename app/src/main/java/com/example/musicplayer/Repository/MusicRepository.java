@@ -9,7 +9,7 @@ import android.provider.MediaStore;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.musicplayer.Model.Music;
+import com.example.musicplayer.model.Music;
 
 import java.util.ArrayList;
 import java.util.List;

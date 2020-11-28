@@ -1,11 +1,14 @@
 package com.example.musicplayer.View.Fragment;
 
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -15,15 +18,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.musicplayer.Adapter.MusicAdapter;
-import com.example.musicplayer.Model.Music;
-import com.example.musicplayer.R;
 import com.example.musicplayer.Storage.SharePref;
-import com.example.musicplayer.Utils.ExtractFromPath;
+import com.example.musicplayer.model.Music;
+import com.example.musicplayer.R;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.example.musicplayer.databinding.MainViewBinding;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
-import java.io.IOException;
 
 public class SongsFragment extends Fragment {
     private MusicAdapter mAdapter;
@@ -47,6 +47,8 @@ public class SongsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(MusicPlayerViewModel.class);
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -60,27 +62,29 @@ public class SongsFragment extends Fragment {
         setupBottomSheet();
         setupAdapter();
 
-        mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
-
-        mBinding.btnPlayBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void onClick(View v) {
-                mViewModel.playMusic();
-                mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
-                mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
-            }
-        });
-
-        mBinding.btnPauseBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mViewModel.pauseMusic();
-                mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
-                mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
-            }
-        });
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_songs,menu);
+
+        MenuItem menuItem=menu.findItem(R.id.menu_search);
+        SearchView searchView= (SearchView) menuItem.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.getFilter().filter(newText);
+                setupAdapter();
+                return false;
+            }
+        });
     }
 
     private void setupBottomSheet() {
@@ -89,15 +93,7 @@ public class SongsFragment extends Fragment {
         mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    mBinding.containerMusicInfo.setVisibility(View.GONE);
-                    mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
-                    mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
-                } else {
-                    mBinding.containerMusicInfo.setVisibility(View.VISIBLE);
-                    mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
-                    mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
-                }
+
             }
 
             @Override
@@ -116,35 +112,32 @@ public class SongsFragment extends Fragment {
     }
 
     private void setupAdapter() {
-        mAdapter = new MusicAdapter(getContext());
-        mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public boolean sendMusicInfo(Music music) {
-                mViewModel.setMusic(music);
-                mBinding.singerNameBottomSheet.setText(music.getSingerName());
-                mBinding.songNameBottomSheet.setText(music.getName());
-                try {
+        if (mAdapter==null) {
+            mAdapter = new MusicAdapter(getContext());
+            mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
+                @RequiresApi(api = Build.VERSION_CODES.N)
+                @Override
+                public void sendMusicInfo(Music music) {
+                    mViewModel.setMusic(music);
+                    if (SharePref.getStateMusic(getContext())) {
+                        mViewModel.pauseMusic();
+                        SharePref.setStateMusic(getContext(),false);
+                    }
+                    mViewModel.setMusicImg(mBinding.imgCoverBottomSheet);
+                    mBinding.setViewModel(mViewModel);
 
-                } catch (Exception e) {
-                    mBinding.imgCoverBottomSheet.setImageDrawable(
-                            getActivity().getResources().getDrawable(R.drawable.ic_null_cover_img));
                 }
 
-                if ( SharePref.getStateMusic(getContext())==null ||
-                        SharePref.getStateMusic(getContext()).equals(null) ||
-                        SharePref.getStateMusic(getContext()).equals("pause")
-                       ){
-                    mViewModel.playMusic();
-                SharePref.setStateMusic(getContext(),"play");
+                @Override
+                public void playMusic(Music music) {
+
                 }
-                else
-                    mViewModel.pauseMusic();
-                return false;
-            }
-        });
-        mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mBinding.recyclerView.setAdapter(mAdapter);
+            });
+            mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            mBinding.recyclerView.setAdapter(mAdapter);
+        }else {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

@@ -3,22 +3,28 @@ package com.example.musicplayer.Storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class SharePref {
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+
+import java.util.Observable;
+
+public class SharePref extends BaseObservable {
     public static final String KEY_STATE_MUSIC = "stateMusic";
 
-    public static String getStateMusic(Context context) {
+    public static boolean getStateMusic(Context context) {
         Context leekSafeContext = context.getApplicationContext();
 
         return getSharedPreferences(leekSafeContext).
-                getString(KEY_STATE_MUSIC,null);
+                getBoolean(KEY_STATE_MUSIC,false);
     }
 
-    public static void setStateMusic(Context context, String string){
+    @Bindable
+    public static void setStateMusic(Context context, boolean state){
         Context leekSafeContext = context.getApplicationContext();
 
         getSharedPreferences(leekSafeContext).
                 edit().
-                putString(KEY_STATE_MUSIC,string).
+                putBoolean(KEY_STATE_MUSIC,state).
                 apply();
     }
 

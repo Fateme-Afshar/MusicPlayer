@@ -2,23 +2,32 @@ package com.example.musicplayer.viewModel;
 
 import android.Manifest;
 import android.app.Application;
+import android.content.ContentUris;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.databinding.Bindable;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.example.musicplayer.Model.Music;
+import com.bumptech.glide.Glide;
+import com.example.musicplayer.R;
 import com.example.musicplayer.Repository.MusicRepository;
+import com.example.musicplayer.Storage.SharePref;
+import com.example.musicplayer.model.Music;
 
 import java.io.IOException;
 import java.util.List;
 
+
 public class MusicPlayerViewModel extends AndroidViewModel {
     private MusicRepository mRepository;
     private MediaPlayer mMediaPlayer;
+    private Music mMusic;
 
     public Music getMusic() {
         return mMusic;
@@ -30,7 +39,6 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         mMediaPlayer = createMediaPlayer(mMusic.getPath());
     }
 
-    private Music mMusic;
 
     public final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -76,14 +84,37 @@ public class MusicPlayerViewModel extends AndroidViewModel {
     public void playMusic() {
         assert mMediaPlayer != null;
         mMediaPlayer.start();
+
+        SharePref.setStateMusic(getApplication(), true);
     }
 
     public void pauseMusic() {
-            mMediaPlayer.stop();
+        mMediaPlayer.stop();
+        SharePref.setStateMusic(getApplication(), true);
     }
 
-    public void releaseMediaPlayer(){
-        mMediaPlayer.release();
-        mMediaPlayer=null;
+    public void releaseMediaPlayer() {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+            SharePref.setStateMusic(getApplication(),false);
+    }
+
+    public void setMusicImg(ImageView imageView) {
+        Uri sArtworkUri = Uri
+                .parse("content://media/external/audio/albumart");
+
+        Uri uri = ContentUris.withAppendedId(sArtworkUri,
+                mMusic.getAlbumId());
+        Glide.with(getApplication()).
+                load(uri).
+                centerCrop().
+                placeholder(R.drawable.ic_null_cover_img).
+                into(imageView);
+    }
+
+    public boolean getMusicState() {
+        return SharePref.getStateMusic(getApplication());
     }
 }
