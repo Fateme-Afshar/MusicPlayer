@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.musicplayer.Adapter.MusicAdapter;
 import com.example.musicplayer.R;
 import com.example.musicplayer.databinding.MainViewBinding;
+import com.example.musicplayer.databinding.ShowMusicDetailBinding;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -27,6 +28,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 public class SongsFragment extends Fragment {
     private MusicAdapter mAdapter;
     private MainViewBinding mBinding;
+    private ShowMusicDetailBinding mMusicDetailBinding;
     private BottomSheetBehavior mBehavior;
 
     private MusicPlayerViewModel mViewModel;
@@ -58,6 +60,7 @@ public class SongsFragment extends Fragment {
                 R.layout.main_view,
                 container,
                 false);
+
         setupBottomSheet();
         setupAdapter();
 
@@ -92,7 +95,8 @@ public class SongsFragment extends Fragment {
         mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
+                    mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
+                    mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
             }
 
             @Override
@@ -100,6 +104,7 @@ public class SongsFragment extends Fragment {
 
             }
         });
+        
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)

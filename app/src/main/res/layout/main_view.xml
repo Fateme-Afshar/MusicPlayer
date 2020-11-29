@@ -42,19 +42,20 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/img_cover_bottom_sheet"
+                    android:id="@+id/img_cover_footer"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
                     tools:src="@drawable/kamranhoman"
                     />
 
                     <TextView
-                        android:id="@+id/song_name_bottom_sheet"
+                        android:id="@+id/song_name_footer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:layout_toEndOf="@+id/img_cover_bottom_sheet"
-                        android:layout_toRightOf="@+id/img_cover_bottom_sheet"
+                        android:layout_marginLeft="@dimen/margin_5"
+                        android:layout_marginTop="@dimen/margin_10"
+                        android:layout_toEndOf="@+id/img_cover_footer"
+                        android:layout_toRightOf="@+id/img_cover_footer"
                         tools:text="@string/hint_music_name"
                         android:text="@{viewModel.getNormalText(viewModel.music.name,30)}"
                         android:fontFamily="@font/segoe_ui_bold"
@@ -62,21 +63,21 @@
                         android:textSize="15sp" />
 
                     <TextView
-                        android:id="@+id/singer_name_bottom_sheet"
+                        android:id="@+id/singer_name_footer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:layout_marginTop="5dp"
-                        android:layout_below="@+id/song_name_bottom_sheet"
-                        android:layout_toEndOf="@+id/img_cover_bottom_sheet"
-                        android:layout_toRightOf="@+id/img_cover_bottom_sheet"
+                        android:layout_below="@+id/song_name_footer"
+                        android:layout_toEndOf="@+id/img_cover_footer"
+                        android:layout_toRightOf="@+id/img_cover_footer"
                         android:fontFamily="@font/comici"
                         tools:text="@string/hint_music_singer"
                         android:text="@{viewModel.getNormalText(viewModel.music.singerName,20)}"
                         android:textColor="@color/black"
                         android:textSize="15sp" />
                 <include layout="@layout/show_music_detail"
-                    android:layout_below="@+id/img_cover_bottom_sheet"
+                    android:layout_below="@+id/img_cover_footer"
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"
                     android:layout_marginTop="10dp"
