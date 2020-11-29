@@ -1,5 +1,6 @@
 package com.example.musicplayer.View.Fragment;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.musicplayer.Adapter.MusicAdapter;
 import com.example.musicplayer.R;
 import com.example.musicplayer.databinding.MainViewBinding;
-import com.example.musicplayer.databinding.ShowMusicDetailBinding;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -28,8 +28,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 public class SongsFragment extends Fragment {
     private MusicAdapter mAdapter;
     private MainViewBinding mBinding;
-    private ShowMusicDetailBinding mMusicDetailBinding;
+
     private BottomSheetBehavior mBehavior;
+
+    private SongsFragmentCallbacks mCallbacks;
 
     private MusicPlayerViewModel mViewModel;
 
@@ -45,9 +47,21 @@ public class SongsFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        if (context instanceof SongsFragmentCallbacks)
+            mCallbacks = (SongsFragmentCallbacks) context;
+        else
+            throw new ClassCastException
+                    ("At first, Must Implement SongsFragmentCallbacks Interface");
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(MusicPlayerViewModel.class);
+        mViewModel = new ViewModelProvider(getActivity()).
+                get(MusicPlayerViewModel.class);
 
         setHasOptionsMenu(true);
     }
@@ -60,7 +74,6 @@ public class SongsFragment extends Fragment {
                 R.layout.main_view,
                 container,
                 false);
-
         setupBottomSheet();
         setupAdapter();
 
@@ -95,8 +108,22 @@ public class SongsFragment extends Fragment {
         mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                    mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
-                    mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
+
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        mCallbacks.startBottomSheetFragment();
+                        mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
+                        mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        if (mViewModel.getMusic().isPlaying())
+                            mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
+                        else
+                            mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
+                        break;
+                    default:
+                        break;
+                }
             }
 
             @Override
@@ -104,7 +131,7 @@ public class SongsFragment extends Fragment {
 
             }
         });
-        
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -125,7 +152,7 @@ public class SongsFragment extends Fragment {
                     mViewModel.setMusic(music);
 
                     mViewModel.setCoverImg(music.getAlbumId(),
-                            mBinding.imgCoverBottomSheet);
+                            mBinding.imgCoverFooter);
 
                     mBinding.setViewModel(mViewModel);
 
@@ -140,7 +167,7 @@ public class SongsFragment extends Fragment {
             });
             mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             mBinding.recyclerView.setAdapter(mAdapter);
-        }else {
+        } else {
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -148,7 +175,10 @@ public class SongsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         mViewModel.releaseMediaPlayer();
+    }
+
+    public interface SongsFragmentCallbacks {
+        void startBottomSheetFragment();
     }
 }

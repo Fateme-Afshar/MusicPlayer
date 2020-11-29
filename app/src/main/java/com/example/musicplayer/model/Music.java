@@ -5,10 +5,11 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Music {
+public class Music implements Serializable {
         private UUID mId ;
         private String mName;
         private String mPath;

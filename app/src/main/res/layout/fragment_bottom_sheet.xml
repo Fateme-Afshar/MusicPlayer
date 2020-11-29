@@ -2,6 +2,12 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
     >
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewModel"
+            type="com.example.musicplayer.viewModel.MusicPlayerViewModel" />
+    </data>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -49,6 +55,7 @@
                 android:src="@drawable/ic_pause"
                 android:layout_centerInParent="true"
                 android:layout_marginBottom="@dimen/margin_10"
+                android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -61,7 +68,9 @@
                 android:layout_marginLeft="62dp"
                 android:layout_marginTop="@dimen/margin_5"
                 android:layout_marginBottom="@dimen/margin_10"
-                android:src="@drawable/ic_next" />
+                android:src="@drawable/ic_next"
+                android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
+                />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/btn_prev"

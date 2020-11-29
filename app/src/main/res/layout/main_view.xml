@@ -76,12 +76,13 @@
                         android:text="@{viewModel.getNormalText(viewModel.music.singerName,20)}"
                         android:textColor="@color/black"
                         android:textSize="15sp" />
-                <include layout="@layout/show_music_detail"
+
+                <FrameLayout
+                    android:id="@+id/bottom_sheet_fragment_container"
                     android:layout_below="@+id/img_cover_footer"
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"
                     android:layout_marginTop="10dp"
-
                     />
             </RelativeLayout>
         </androidx.core.widget.NestedScrollView>
@@ -96,8 +97,8 @@
             android:src="@drawable/ic_play"
             app:layout_anchor="@+id/btn_pause_bottom_sheet"
             app:layout_anchorGravity="center"
-            android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
             android:visibility="@{viewModel.music.isPlaying() ? View.GONE : View.VISIBLE}"
+            android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
             />
 
         <ImageView
@@ -107,8 +108,8 @@
             android:layout_gravity="bottom|right"
             android:layout_margin="10dp"
             android:src="@drawable/ic_pause"
-            android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
             android:visibility="@{viewModel.music.isPlaying() ? View.VISIBLE : View.GONE}"
+            android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
             />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
