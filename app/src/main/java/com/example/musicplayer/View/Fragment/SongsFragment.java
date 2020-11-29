@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.musicplayer.Adapter.MusicAdapter;
 import com.example.musicplayer.MessageLoop.MusicLoader;
 import com.example.musicplayer.R;
+import com.example.musicplayer.Repository.MusicRepository;
+import com.example.musicplayer.Storage.SharePref;
 import com.example.musicplayer.databinding.MainViewBinding;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
@@ -152,8 +154,21 @@ public class SongsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+       if (SharePref.getLastMusic(getContext())==null){
+           SharePref.setLastMusic(getContext(), "/storage/6507-0AD9/1212/02 - Delam Havato Kardeh.mp3");
+       }
+        setLastMusic();
+        updateBottomNavUI();
         if (mAdapter.getMusicNameList().size() == 0)
             mAdapter.setMusicNameList(mViewModel.getMusics());
+    }
+
+    private void setLastMusic() {
+        Music lastPlayedMusic= MusicRepository.getMusic(
+                 getContext(),
+                 SharePref.getLastMusic(getContext()));
+
+        mViewModel.setMusic(lastPlayedMusic);
     }
 
     private void setupAdapter() {
@@ -164,25 +179,27 @@ public class SongsFragment extends Fragment {
                 @Override
                 public void sendMusicInfo(Music music) {
                     mViewModel.setMusic(music);
-
-                    mViewModel.setCoverImg(music.getAlbumId(),
-                            mBinding.imgCoverFooter);
-
-                    mBinding.setViewModel(mViewModel);
-
-                    if (music.isPlaying()) {
-                        mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
-                        mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
-                    } else {
-                        mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
-                        mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
-                    }
+                    updateBottomNavUI();
                 }
             });
             mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             mBinding.recyclerView.setAdapter(mAdapter);
         } else {
             mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void updateBottomNavUI() {
+        mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
+                mBinding.imgCoverFooter);
+        mBinding.setViewModel(mViewModel);
+
+        if (mViewModel.getMusic().isPlaying()) {
+            mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
+            mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
+        } else {
+            mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
+            mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
         }
     }
 

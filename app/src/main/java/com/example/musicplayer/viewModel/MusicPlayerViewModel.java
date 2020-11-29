@@ -17,6 +17,7 @@ import androidx.lifecycle.AndroidViewModel;
 import com.bumptech.glide.Glide;
 import com.example.musicplayer.R;
 import com.example.musicplayer.Repository.MusicRepository;
+import com.example.musicplayer.Storage.SharePref;
 import com.example.musicplayer.Utils.SeekBarRunnable;
 import com.example.musicplayer.model.Music;
 
@@ -72,8 +73,8 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         mMediaPlayer=new MediaPlayer();
         try {
             mMediaPlayer.setDataSource(path);
-            mMediaPlayer.prepare();
             mMediaPlayer.setVolume(0.5f, 0.5f);
+            mMediaPlayer.prepare();
             mMediaPlayer.setLooping(false);
             return mMediaPlayer;
         } catch (IOException e) {
@@ -119,18 +120,19 @@ public class MusicPlayerViewModel extends AndroidViewModel {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void checkPlayPauseMusic(){
-        mMediaPlayer=mMusic.getMediaPlayer();
+            mMediaPlayer = mMusic.getMediaPlayer();
         if (!mMusic.isPlaying()){
             mMusic.setPlaying(true);
-            mMusic.getMediaPlayer().start();
+            mMediaPlayer.start();
             new Thread(mSeekBarRunnable).start();
         }else {
-            mMusic.getMediaPlayer().pause();
+            mMediaPlayer.pause();
             mMusic.setPlaying(false);
         }
     }
 
     public void releaseMediaPlayer(){
-        mMusic.getMediaPlayer().release();
+        if (mMediaPlayer != null)
+            mMediaPlayer.release();
     }
 }

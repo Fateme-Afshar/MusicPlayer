@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicplayer.MessageLoop.MusicLoader;
+import com.example.musicplayer.Storage.SharePref;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.R;
 import com.example.musicplayer.databinding.ItemMusicBinding;
@@ -76,12 +77,13 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         holder.bind(mMusicList.get(position));
+        Music music=mMusicList.get(position);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCallback.sendMusicInfo(mMusicList.get(position));
-                mViewModel.setMusic(mMusicList.get(position));
-
+                mCallback.sendMusicInfo(music);
+                mViewModel.setMusic(music);
+                SharePref.setLastMusic(mContext,music.getPath());
                 mViewModel.checkPlayPauseMusic();
             }
         });
