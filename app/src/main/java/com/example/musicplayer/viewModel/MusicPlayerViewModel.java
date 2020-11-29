@@ -68,14 +68,14 @@ public class MusicPlayerViewModel extends AndroidViewModel {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private MediaPlayer createMediaPlayer(String path) {
-        MediaPlayer mediaPlayer = new MediaPlayer();
+    public MediaPlayer createMediaPlayer(String path) {
+        mMediaPlayer=new MediaPlayer();
         try {
-            mediaPlayer.setDataSource(path);
-            mediaPlayer.prepare();
-            mediaPlayer.setVolume(0.5f, 0.5f);
-            mediaPlayer.setLooping(false);
-            return mediaPlayer;
+            mMediaPlayer.setDataSource(path);
+            mMediaPlayer.prepare();
+            mMediaPlayer.setVolume(0.5f, 0.5f);
+            mMediaPlayer.setLooping(false);
+            return mMediaPlayer;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -116,25 +116,21 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
     /**
      * this method check {@music.isPlaying()} if music playing , pause music else play music
-     * @param music
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void checkPlayPauseMusic(Music music){
-
-        mMediaPlayer=new MediaPlayer();
-        mMediaPlayer=createMediaPlayer(music.getPath());
+    public void checkPlayPauseMusic(){
+        mMediaPlayer=mMusic.getMediaPlayer();
         if (!mMusic.isPlaying()){
             mMusic.setPlaying(true);
-            mMediaPlayer.start();
+            mMusic.getMediaPlayer().start();
             new Thread(mSeekBarRunnable).start();
         }else {
-            mMediaPlayer.pause();
+            mMusic.getMediaPlayer().pause();
             mMusic.setPlaying(false);
         }
     }
 
     public void releaseMediaPlayer(){
-        mMediaPlayer.release();
-        mMediaPlayer=null;
+        mMusic.getMediaPlayer().release();
     }
 }

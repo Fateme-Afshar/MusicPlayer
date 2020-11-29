@@ -1,6 +1,7 @@
 package com.example.musicplayer.View.Fragment;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.musicplayer.Adapter.MusicAdapter;
+import com.example.musicplayer.MessageLoop.MusicLoader;
 import com.example.musicplayer.R;
 import com.example.musicplayer.databinding.MainViewBinding;
 import com.example.musicplayer.model.Music;
@@ -34,6 +36,8 @@ public class SongsFragment extends Fragment {
     private SongsFragmentCallbacks mCallbacks;
 
     private MusicPlayerViewModel mViewModel;
+
+    private MusicLoader<MusicAdapter.Holder> mMusicLoader;
 
     public SongsFragment() {
         // Required empty public constructor
@@ -62,6 +66,16 @@ public class SongsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(getActivity()).
                 get(MusicPlayerViewModel.class);
+
+        mMusicLoader=new MusicLoader<>();
+        mMusicLoader.start();
+        mMusicLoader.getLooper();
+        mMusicLoader.setCallbacks(new MusicLoader.MusicLoaderCallback<MusicAdapter.Holder>() {
+            @Override
+            public void onMusicLoader(MusicAdapter.Holder target, MediaPlayer path) {
+                target.bindMediaPlayer(path);
+            }
+        });
 
         setHasOptionsMenu(true);
     }
@@ -144,7 +158,7 @@ public class SongsFragment extends Fragment {
 
     private void setupAdapter() {
         if (mAdapter==null) {
-            mAdapter = new MusicAdapter(getContext(), mViewModel);
+            mAdapter = new MusicAdapter(getContext(), mViewModel,mMusicLoader);
             mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
                 @RequiresApi(api = Build.VERSION_CODES.N)
                 @Override

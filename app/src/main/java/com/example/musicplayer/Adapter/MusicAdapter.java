@@ -1,7 +1,9 @@
 package com.example.musicplayer.Adapter;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +15,14 @@ import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musicplayer.MessageLoop.MusicLoader;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.R;
 import com.example.musicplayer.databinding.ItemMusicBinding;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> implements Filterable {
@@ -34,6 +38,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
 
     private MusicPlayerViewModel mViewModel;
 
+    private MusicLoader<Holder> mMusicLoader;
+
     public void setCallback(MusicAdapterCallback callback) {
         mCallback = callback;
     }
@@ -47,9 +53,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
         mSearchResults=new ArrayList<>(musicList);
     }
 
-    public MusicAdapter(Context context,MusicPlayerViewModel viewModel) {
+    public MusicAdapter(Context context, MusicPlayerViewModel viewModel, MusicLoader<Holder> musicLoader) {
         mContext = context.getApplicationContext();
         mViewModel=viewModel;
+        mMusicLoader=musicLoader;
     }
 
 
@@ -73,8 +80,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
             @Override
             public void onClick(View v) {
                 mCallback.sendMusicInfo(mMusicList.get(position));
+                mViewModel.setMusic(mMusicList.get(position));
 
-                mViewModel.checkPlayPauseMusic(mMusicList.get(position));
+                mViewModel.checkPlayPauseMusic();
             }
         });
     }
@@ -84,8 +92,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
         return mMusicList.size();
     }
 
-    class Holder extends RecyclerView.ViewHolder {
+  public   class Holder extends RecyclerView.ViewHolder {
         private ItemMusicBinding mBinding;
+        private Music mMusic;
 
         public Holder(@NonNull ItemMusicBinding binding) {
             super(binding.getRoot());
@@ -94,11 +103,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
 
         @RequiresApi(api = Build.VERSION_CODES.N)
         public void bind(Music music) {
-
+            mMusic=music;
             mViewModel.setCoverImg(music.getAlbumId(),mBinding.imgCover);
             //TODO: I think this way to set duration is heavy , so what is true way?
             music.setDuration(music.getPath());
-            mBinding.setMusic(music);
+            mBinding.setMusic(mMusic);
+            mMusicLoader.createMessage(this,mMusic.getPath());
+        }
+
+        public void bindMediaPlayer(MediaPlayer mediaPlayer){
+              mMusic.setMediaPlayer(mediaPlayer);
         }
     }
     public interface MusicAdapterCallback {

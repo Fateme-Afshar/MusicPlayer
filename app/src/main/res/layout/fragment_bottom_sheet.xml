@@ -47,7 +47,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginBottom="@dimen/margin_10"
                 android:visibility="@{viewModel.music.isPlaying ? View.INVISIBLE : View.VISIBLE}"
-                android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
+                android:onClick="@{()->viewModel.checkPlayPauseMusic()}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -59,7 +59,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginBottom="@dimen/margin_10"
                 android:visibility="@{viewModel.music.isPlaying ? View.VISIBLE : View.INVISIBLE}"
-                android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
+                android:onClick="@{()->viewModel.checkPlayPauseMusic()}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView

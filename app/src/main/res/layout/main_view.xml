@@ -98,7 +98,7 @@
             app:layout_anchor="@+id/btn_pause_bottom_sheet"
             app:layout_anchorGravity="center"
             android:visibility="@{viewModel.music.isPlaying() ? View.GONE : View.VISIBLE}"
-            android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
+            android:onClick="@{()->viewModel.checkPlayPauseMusic()}"
             />
 
         <ImageView
@@ -109,7 +109,7 @@
             android:layout_margin="10dp"
             android:src="@drawable/ic_pause"
             android:visibility="@{viewModel.music.isPlaying() ? View.VISIBLE : View.GONE}"
-            android:onClick="@{()->viewModel.checkPlayPauseMusic(viewModel.music)}"
+            android:onClick="@{()->viewModel.checkPlayPauseMusic()}"
             />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

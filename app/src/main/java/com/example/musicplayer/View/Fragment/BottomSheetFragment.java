@@ -51,11 +51,11 @@ public class BottomSheetFragment extends Fragment {
         mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
                 mBinding.imgCoverBottomSheet);
         mBinding.setViewModel(mViewModel);
-        setupSeekbar();
+        setupSeekBar();
         return mBinding.getRoot();
     }
 
-    private void setupSeekbar() {
+    private void setupSeekBar() {
         SeekBarRunnable seekBarRunnable =
                 new SeekBarRunnable(mViewModel.getMediaPlayer(), mBinding.seekbar);
         mViewModel.setSeekBarRunnable(mBinding.seekbar);

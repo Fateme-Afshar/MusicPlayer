@@ -1,6 +1,7 @@
 package com.example.musicplayer.model;
 
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -17,6 +18,7 @@ public class Music implements Serializable {
         private int mDuration;
         private int mAlbumId;
         private boolean mIsPlaying=false;
+        private MediaPlayer mMediaPlayer;
 
     public Music(String name, String singerName, String path, int albumId) {
         mId=UUID.randomUUID();
@@ -74,13 +76,20 @@ public class Music implements Serializable {
         mDuration=Integer.parseInt(duration);
     }
 
-
     public boolean isPlaying() {
         return mIsPlaying;
     }
 
     public void setPlaying(boolean playing) {
         mIsPlaying = playing;
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mMediaPlayer;
+    }
+
+    public void setMediaPlayer(MediaPlayer mediaPlayer) {
+        mMediaPlayer = mediaPlayer;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
