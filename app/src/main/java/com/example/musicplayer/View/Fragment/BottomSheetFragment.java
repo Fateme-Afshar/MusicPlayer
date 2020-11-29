@@ -4,12 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.musicplayer.R;
+import com.example.musicplayer.Utils.SeekBarRunnable;
 import com.example.musicplayer.databinding.FragmentBottomSheetBinding;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 
@@ -34,6 +36,7 @@ public class BottomSheetFragment extends Fragment {
 
         mViewModel = new ViewModelProvider(getActivity()).
                 get(MusicPlayerViewModel.class);
+
     }
 
     @Override
@@ -48,21 +51,37 @@ public class BottomSheetFragment extends Fragment {
         mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
                 mBinding.imgCoverBottomSheet);
         mBinding.setViewModel(mViewModel);
-
-        setupBtnPlayPause();
-
+        setupSeekbar();
         return mBinding.getRoot();
     }
 
-    private void setupBtnPlayPause() {
-        if (mViewModel.getMusic().isPlaying()) {
-            mBinding.btnPlay.setVisibility(View.INVISIBLE);
-            mBinding.btnPause.setVisibility(View.VISIBLE);
-        } else {
-            mBinding.btnPlay.setVisibility(View.VISIBLE);
-            mBinding.btnPause.setVisibility(View.INVISIBLE);
-        }
+    private void setupSeekbar() {
+        SeekBarRunnable seekBarRunnable =
+                new SeekBarRunnable(mViewModel.getMediaPlayer(), mBinding.seekbar);
+        mViewModel.setSeekBarRunnable(mBinding.seekbar);
+        if (mViewModel.getMusic().isPlaying())
+            new Thread(seekBarRunnable).start();
+
+        mBinding.seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int x = (int) Math.ceil(progress / 1000f);
+
+                if (x == 0 && mViewModel.getMediaPlayer() != null && !mViewModel.getMediaPlayer().isPlaying())
+                    seekBar.setProgress(0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (mViewModel.getMediaPlayer() != null && mViewModel.getMediaPlayer().isPlaying()) {
+                    mViewModel.getMediaPlayer().seekTo(seekBar.getProgress());
+                }
+            }
+        });
     }
-
-
 }

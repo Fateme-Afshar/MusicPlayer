@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -16,6 +17,7 @@ import androidx.lifecycle.AndroidViewModel;
 import com.bumptech.glide.Glide;
 import com.example.musicplayer.R;
 import com.example.musicplayer.Repository.MusicRepository;
+import com.example.musicplayer.Utils.SeekBarRunnable;
 import com.example.musicplayer.model.Music;
 
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.util.List;
 public class MusicPlayerViewModel extends AndroidViewModel {
     private Music mMusic;
     private MediaPlayer mMediaPlayer;
+    private SeekBarRunnable mSeekBarRunnable;
 
     public final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -55,6 +58,13 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
     public void setMusic(Music music) {
         mMusic = music;
+    }
+
+    public void setSeekBarRunnable(SeekBar seekBar){
+        mSeekBarRunnable=new SeekBarRunnable(mMediaPlayer,seekBar);
+    }
+    public MediaPlayer getMediaPlayer() {
+        return mMediaPlayer;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -110,11 +120,13 @@ public class MusicPlayerViewModel extends AndroidViewModel {
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void checkPlayPauseMusic(Music music){
+
         mMediaPlayer=new MediaPlayer();
         mMediaPlayer=createMediaPlayer(music.getPath());
         if (!mMusic.isPlaying()){
             mMusic.setPlaying(true);
             mMediaPlayer.start();
+            new Thread(mSeekBarRunnable).start();
         }else {
             mMediaPlayer.pause();
             mMusic.setPlaying(false);
