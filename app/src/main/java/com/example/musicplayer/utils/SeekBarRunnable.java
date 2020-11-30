@@ -1,4 +1,4 @@
-package com.example.musicplayer.Utils;
+package com.example.musicplayer.utils;
 
 import android.media.MediaPlayer;
 import android.widget.SeekBar;

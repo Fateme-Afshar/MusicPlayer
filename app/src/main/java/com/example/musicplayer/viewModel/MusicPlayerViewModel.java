@@ -15,13 +15,13 @@ import androidx.annotation.RequiresApi;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.bumptech.glide.Glide;
+import com.example.musicplayer.adapter.MusicAdapter;
+import com.example.musicplayer.messageLoop.MusicLoader;
 import com.example.musicplayer.R;
-import com.example.musicplayer.Repository.MusicRepository;
-import com.example.musicplayer.Storage.SharePref;
-import com.example.musicplayer.Utils.SeekBarRunnable;
+import com.example.musicplayer.repository.MusicRepository;
+import com.example.musicplayer.utils.SeekBarRunnable;
 import com.example.musicplayer.model.Music;
 
-import java.io.IOException;
 import java.util.List;
 
 
@@ -29,6 +29,7 @@ public class MusicPlayerViewModel extends AndroidViewModel {
     private Music mMusic;
     private MediaPlayer mMediaPlayer;
     private SeekBarRunnable mSeekBarRunnable;
+    private MusicLoader<MusicAdapter.Holder> mMusicLoader;
 
     public final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -68,20 +69,41 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         return mMediaPlayer;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public MediaPlayer createMediaPlayer(String path) {
-        mMediaPlayer=new MediaPlayer();
-        try {
-            mMediaPlayer.setDataSource(path);
-            mMediaPlayer.setVolume(0.5f, 0.5f);
-            mMediaPlayer.prepare();
-            mMediaPlayer.setLooping(false);
-            return mMediaPlayer;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public MusicLoader<MusicAdapter.Holder> getMusicLoader() {
+        return mMusicLoader;
+    }
 
-        return null;
+    /**
+     * this method check {@music.isPlaying()} if music playing , pause music else play music
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void checkPlayPauseMusic(){
+            mMediaPlayer = mMusic.getMediaPlayer();
+        if (!mMusic.isPlaying()){
+            mMusic.setPlaying(true);
+            mMediaPlayer.start();
+            new Thread(mSeekBarRunnable).start();
+        }else {
+            mMediaPlayer.pause();
+            mMusic.setPlaying(false);
+        }
+    }
+
+    public void releaseMediaPlayer(){
+        if (mMediaPlayer != null)
+            mMediaPlayer.release();
+    }
+
+    public void setupLooper() {
+        mMusicLoader=new MusicLoader<>();
+        mMusicLoader.start();
+        mMusicLoader.getLooper();
+        mMusicLoader.setCallbacks(new MusicLoader.MusicLoaderCallback<MusicAdapter.Holder>() {
+            @Override
+            public void onMusicLoader(MusicAdapter.Holder target, MediaPlayer path) {
+                target.bindMediaPlayer(path);
+            }
+        });
     }
 
     public String getNormalText(String text,int textLength) {
@@ -113,26 +135,5 @@ public class MusicPlayerViewModel extends AndroidViewModel {
                 placeholder(R.drawable.ic_null_cover_img).
                 into(view);
 
-    }
-
-    /**
-     * this method check {@music.isPlaying()} if music playing , pause music else play music
-     */
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void checkPlayPauseMusic(){
-            mMediaPlayer = mMusic.getMediaPlayer();
-        if (!mMusic.isPlaying()){
-            mMusic.setPlaying(true);
-            mMediaPlayer.start();
-            new Thread(mSeekBarRunnable).start();
-        }else {
-            mMediaPlayer.pause();
-            mMusic.setPlaying(false);
-        }
-    }
-
-    public void releaseMediaPlayer(){
-        if (mMediaPlayer != null)
-            mMediaPlayer.release();
     }
 }

@@ -1,9 +1,8 @@
-package com.example.musicplayer.Adapter;
+package com.example.musicplayer.adapter;
 
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Build;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +14,14 @@ import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.musicplayer.MessageLoop.MusicLoader;
-import com.example.musicplayer.Storage.SharePref;
+import com.example.musicplayer.messageLoop.MusicLoader;
+import com.example.musicplayer.storage.SharePref;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.R;
 import com.example.musicplayer.databinding.ItemMusicBinding;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> implements Filterable {
@@ -54,10 +52,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
         mSearchResults=new ArrayList<>(musicList);
     }
 
-    public MusicAdapter(Context context, MusicPlayerViewModel viewModel, MusicLoader<Holder> musicLoader) {
+    public MusicAdapter(Context context, MusicPlayerViewModel viewModel) {
         mContext = context.getApplicationContext();
         mViewModel=viewModel;
-        mMusicLoader=musicLoader;
+        mMusicLoader=mViewModel.getMusicLoader();
     }
 
 

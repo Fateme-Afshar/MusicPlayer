@@ -1,4 +1,4 @@
-package com.example.musicplayer.MessageLoop;
+package com.example.musicplayer.messageLoop;
 
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -9,10 +9,7 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.example.musicplayer.model.Music;
-
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MusicLoader<T> extends HandlerThread {

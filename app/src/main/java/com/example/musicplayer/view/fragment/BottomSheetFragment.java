@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.musicplayer.R;
-import com.example.musicplayer.Utils.SeekBarRunnable;
+import com.example.musicplayer.utils.SeekBarRunnable;
 import com.example.musicplayer.databinding.FragmentBottomSheetBinding;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 
@@ -42,7 +42,6 @@ public class BottomSheetFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         mBinding = DataBindingUtil.inflate(inflater,
                 R.layout.fragment_bottom_sheet,
                 container,
@@ -50,8 +49,10 @@ public class BottomSheetFragment extends Fragment {
 
         mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
                 mBinding.imgCoverBottomSheet);
+
         mBinding.setViewModel(mViewModel);
         mBinding.setFragment(this);
+
         setupSeekBar();
         return mBinding.getRoot();
     }
@@ -59,7 +60,9 @@ public class BottomSheetFragment extends Fragment {
     private void setupSeekBar() {
         SeekBarRunnable seekBarRunnable =
                 new SeekBarRunnable(mViewModel.getMediaPlayer(), mBinding.seekbar);
+
         mViewModel.setSeekBarRunnable(mBinding.seekbar);
+
         if (mViewModel.getMusic().isPlaying())
             new Thread(seekBarRunnable).start();
 
@@ -88,11 +91,11 @@ public class BottomSheetFragment extends Fragment {
 
     public void setupVisibility() {
         if (mViewModel.getMusic().isPlaying()) {
-            mBinding.btnPlay.setVisibility(View.GONE);
+            mBinding.btnPlay.setVisibility(View.INVISIBLE);
             mBinding.btnPause.setVisibility(View.VISIBLE);
         } else {
             mBinding.btnPlay.setVisibility(View.VISIBLE);
-            mBinding.btnPause.setVisibility(View.GONE);
+            mBinding.btnPause.setVisibility(View.INVISIBLE);
         }
     }
 }

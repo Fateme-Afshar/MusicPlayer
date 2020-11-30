@@ -1,7 +1,6 @@
 package com.example.musicplayer.view.fragment;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,17 +18,17 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.musicplayer.Adapter.MusicAdapter;
-import com.example.musicplayer.MessageLoop.MusicLoader;
+import com.example.musicplayer.adapter.MusicAdapter;
 import com.example.musicplayer.R;
-import com.example.musicplayer.Repository.MusicRepository;
-import com.example.musicplayer.Storage.SharePref;
+import com.example.musicplayer.repository.MusicRepository;
+import com.example.musicplayer.storage.SharePref;
 import com.example.musicplayer.databinding.MainViewBinding;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class SongsFragment extends Fragment {
+    public static final String DEFULT_MUSIC_PATH = "/storage/6507-0AD9/1212/02 - Delam Havato Kardeh.mp3";
     private MusicAdapter mAdapter;
     private MainViewBinding mBinding;
 
@@ -38,8 +37,6 @@ public class SongsFragment extends Fragment {
     private SongsFragmentCallbacks mCallbacks;
 
     private MusicPlayerViewModel mViewModel;
-
-    private MusicLoader<MusicAdapter.Holder> mMusicLoader;
 
     public SongsFragment() {
         // Required empty public constructor
@@ -69,15 +66,7 @@ public class SongsFragment extends Fragment {
         mViewModel = new ViewModelProvider(getActivity()).
                 get(MusicPlayerViewModel.class);
 
-        mMusicLoader=new MusicLoader<>();
-        mMusicLoader.start();
-        mMusicLoader.getLooper();
-        mMusicLoader.setCallbacks(new MusicLoader.MusicLoaderCallback<MusicAdapter.Holder>() {
-            @Override
-            public void onMusicLoader(MusicAdapter.Holder target, MediaPlayer path) {
-                target.bindMediaPlayer(path);
-            }
-        });
+        mViewModel.setupLooper();
 
         setHasOptionsMenu(true);
     }
@@ -120,7 +109,9 @@ public class SongsFragment extends Fragment {
 
     private void setupBottomSheet() {
         mBehavior = BottomSheetBehavior.from(mBinding.bottomSheet);
+
         mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
         mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -128,8 +119,8 @@ public class SongsFragment extends Fragment {
                 switch (newState) {
                     case BottomSheetBehavior.STATE_SETTLING:
                         mCallbacks.startBottomSheetFragment();
-                        mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
-                        mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
+                        mBinding.btnPauseBottomSheet.setVisibility(View.INVISIBLE);
+                        mBinding.btnPlayBottomSheet.setVisibility(View.INVISIBLE);
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         if (mViewModel.getMusic().isPlaying())
@@ -154,44 +145,50 @@ public class SongsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-       if (SharePref.getLastMusic(getContext())==null){
-           SharePref.setLastMusic(getContext(), "/storage/6507-0AD9/1212/02 - Delam Havato Kardeh.mp3");
-       }
-        setLastMusic();
-        updateBottomNavUI();
         if (mAdapter.getMusicNameList().size() == 0)
             mAdapter.setMusicNameList(mViewModel.getMusics());
+
+        setupLastMusicShow();
     }
 
-    private void setLastMusic() {
-        Music lastPlayedMusic= MusicRepository.getMusic(
+    private void setupLastMusicShow() {
+        if (SharePref.getLastMusic(getContext())==null){
+            SharePref.setLastMusic(getContext(), DEFULT_MUSIC_PATH);
+        }
+        mViewModel.setMusic(getLastMusic());
+        updateBottomNavUI();
+    }
+
+    private Music getLastMusic() {
+
+        return MusicRepository.getMusic(
                  getContext(),
                  SharePref.getLastMusic(getContext()));
-
-        mViewModel.setMusic(lastPlayedMusic);
     }
 
     private void setupAdapter() {
         if (mAdapter==null) {
-            mAdapter = new MusicAdapter(getContext(), mViewModel,mMusicLoader);
-            mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
-                @RequiresApi(api = Build.VERSION_CODES.N)
-                @Override
-                public void sendMusicInfo(Music music) {
-                    mViewModel.setMusic(music);
-                    updateBottomNavUI();
-                }
-            });
+            mAdapter = new MusicAdapter(getContext(), mViewModel);
             mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             mBinding.recyclerView.setAdapter(mAdapter);
         } else {
             mAdapter.notifyDataSetChanged();
         }
+
+        mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void sendMusicInfo(Music music) {
+                mViewModel.setMusic(music);
+                updateBottomNavUI();
+            }
+        });
     }
 
     public void updateBottomNavUI() {
         mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
                 mBinding.imgCoverFooter);
+
         mBinding.setViewModel(mViewModel);
 
         setupVisibility();
@@ -199,11 +196,11 @@ public class SongsFragment extends Fragment {
 
     public void setupVisibility() {
         if (mViewModel.getMusic().isPlaying()) {
-            mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
+            mBinding.btnPlayBottomSheet.setVisibility(View.INVISIBLE);
             mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);
         } else {
             mBinding.btnPlayBottomSheet.setVisibility(View.VISIBLE);
-            mBinding.btnPauseBottomSheet.setVisibility(View.GONE);
+            mBinding.btnPauseBottomSheet.setVisibility(View.INVISIBLE);
         }
     }
 

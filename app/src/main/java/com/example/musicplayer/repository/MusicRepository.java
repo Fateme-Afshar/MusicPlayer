@@ -1,4 +1,4 @@
-package com.example.musicplayer.Repository;
+package com.example.musicplayer.repository;
 
 import android.content.ContentResolver;
 import android.content.Context;

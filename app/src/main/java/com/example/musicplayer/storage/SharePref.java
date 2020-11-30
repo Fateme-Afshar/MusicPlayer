@@ -1,12 +1,7 @@
-package com.example.musicplayer.Storage;
+package com.example.musicplayer.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import androidx.databinding.BaseObservable;
-import androidx.databinding.Bindable;
-
-import java.util.Observable;
 
 public class SharePref{
     public static final String KEY_STATE_MUSIC = "stateMusic";

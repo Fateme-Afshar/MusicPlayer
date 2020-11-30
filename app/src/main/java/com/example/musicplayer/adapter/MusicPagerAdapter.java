@@ -1,4 +1,4 @@
-package com.example.musicplayer.Adapter;
+package com.example.musicplayer.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
