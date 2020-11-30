@@ -1,7 +1,6 @@
 package com.example.musicplayer.adapter;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +13,11 @@ import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.musicplayer.messageLoop.MusicLoader;
-import com.example.musicplayer.storage.SharePref;
-import com.example.musicplayer.model.Music;
 import com.example.musicplayer.R;
 import com.example.musicplayer.databinding.ItemMusicBinding;
+import com.example.musicplayer.messageLoop.MusicLoader;
+import com.example.musicplayer.model.Music;
+import com.example.musicplayer.storage.SharePref;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 
 import java.util.ArrayList;
@@ -55,7 +54,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
     public MusicAdapter(Context context, MusicPlayerViewModel viewModel) {
         mContext = context.getApplicationContext();
         mViewModel=viewModel;
-        mMusicLoader=mViewModel.getMusicLoader();
     }
 
 
@@ -76,14 +74,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         holder.bind(mMusicList.get(position));
         Music music=mMusicList.get(position);
+
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCallback.sendMusicInfo(music);
+                mCallback.sendMusicInfo(music, position);
                 mViewModel.setMusic(music);
-                SharePref.setLastMusic(mContext,music.getPath());
+                SharePref.setLastMusicPath(mContext, music.getPath());
                 mViewModel.checkPlayPauseMusic();
-            }
+                }
         });
     }
 
@@ -108,15 +108,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
             //TODO: I think this way to set duration is heavy , so what is true way?
             music.setDuration(music.getPath());
             mBinding.setMusic(mMusic);
-            mMusicLoader.createMessage(this,mMusic.getPath());
-        }
-
-        public void bindMediaPlayer(MediaPlayer mediaPlayer){
-              mMusic.setMediaPlayer(mediaPlayer);
+            mViewModel.getMusicLoader().createMediaPlayer(mMusic.getPath());
         }
     }
     public interface MusicAdapterCallback {
-        void sendMusicInfo(Music music);
+        void sendMusicInfo(Music music, int position);
     }
 
     private Filter mFilter=new Filter() {

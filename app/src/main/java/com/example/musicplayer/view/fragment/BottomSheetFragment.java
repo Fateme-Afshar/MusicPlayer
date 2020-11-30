@@ -52,7 +52,6 @@ public class BottomSheetFragment extends Fragment {
 
         mBinding.setViewModel(mViewModel);
         mBinding.setFragment(this);
-
         setupSeekBar();
         return mBinding.getRoot();
     }

@@ -37,25 +37,30 @@ public class MusicLoader<T> extends HandlerThread {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
-                if (msg.what==WHAT_LOAD_MESSAGE){
-                    if (msg.obj==null)
-                        return;
-                    T target= (T) msg.obj;
-                    String path=mRequestMap.get(target);
-
-                    MediaPlayer mediaPlayer=createMediaPlayer(path);
-
-                    mHandlerRequest.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mRequestMap.get(target)!=path)
-                                return;
-                            mCallbacks.onMusicLoader(target,mediaPlayer);
-                        }
-                    });
-                }
+                getHandleMessage(msg);
             }
         };
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void getHandleMessage(@NonNull Message msg) {
+        if (msg.what==WHAT_LOAD_MESSAGE){
+            if (msg.obj==null)
+                return;
+            T target= (T) msg.obj;
+            String path=mRequestMap.get(target);
+
+            MediaPlayer mediaPlayer=createMediaPlayer(path);
+
+            mHandlerRequest.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (!mRequestMap.get(target).equals(path))
+                        return;
+                    mCallbacks.onMusicLoader(target,mediaPlayer);
+                }
+            });
+        }
     }
 
     public  void createMessage(T target,String path){

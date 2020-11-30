@@ -23,14 +23,14 @@ public class SharePref{
                 apply();
     }
 
-    public static String getLastMusic(Context context){
+    public static String getLastMusicPath(Context context){
         Context leekSafeContext = context.getApplicationContext();
 
         return getSharedPreferences(leekSafeContext).
                 getString(KEY_LAST_MUSIC,null);
     }
 
-    public static void setLastMusic(Context context, String lastMusicPath){
+    public static void setLastMusicPath(Context context, String lastMusicPath){
         Context leekSafeContext = context.getApplicationContext();
 
         getSharedPreferences(leekSafeContext).

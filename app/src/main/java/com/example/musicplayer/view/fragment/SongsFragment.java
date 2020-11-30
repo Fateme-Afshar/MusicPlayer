@@ -28,7 +28,9 @@ import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 public class SongsFragment extends Fragment {
-    public static final String DEFULT_MUSIC_PATH = "/storage/6507-0AD9/1212/02 - Delam Havato Kardeh.mp3";
+    public static final String DEFAULT_MUSIC_PATH =
+            "/storage/6507-0AD9/1212/02 - Delam Havato Kardeh.mp3";
+
     private MusicAdapter mAdapter;
     private MainViewBinding mBinding;
 
@@ -65,8 +67,6 @@ public class SongsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(getActivity()).
                 get(MusicPlayerViewModel.class);
-
-        mViewModel.setupLooper();
 
         setHasOptionsMenu(true);
     }
@@ -152,8 +152,8 @@ public class SongsFragment extends Fragment {
     }
 
     private void setupLastMusicShow() {
-        if (SharePref.getLastMusic(getContext())==null){
-            SharePref.setLastMusic(getContext(), DEFULT_MUSIC_PATH);
+        if (SharePref.getLastMusicPath(getContext())==null){
+            SharePref.setLastMusicPath(getContext(), DEFAULT_MUSIC_PATH);
         }
         mViewModel.setMusic(getLastMusic());
         updateBottomNavUI();
@@ -163,7 +163,7 @@ public class SongsFragment extends Fragment {
 
         return MusicRepository.getMusic(
                  getContext(),
-                 SharePref.getLastMusic(getContext()));
+                 SharePref.getLastMusicPath(getContext()));
     }
 
     private void setupAdapter() {
@@ -178,7 +178,7 @@ public class SongsFragment extends Fragment {
         mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
-            public void sendMusicInfo(Music music) {
+            public void sendMusicInfo(Music music,int position) {
                 mViewModel.setMusic(music);
                 updateBottomNavUI();
             }

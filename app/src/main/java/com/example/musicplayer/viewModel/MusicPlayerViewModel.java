@@ -15,21 +15,25 @@ import androidx.annotation.RequiresApi;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.bumptech.glide.Glide;
-import com.example.musicplayer.adapter.MusicAdapter;
-import com.example.musicplayer.messageLoop.MusicLoader;
 import com.example.musicplayer.R;
-import com.example.musicplayer.repository.MusicRepository;
-import com.example.musicplayer.utils.SeekBarRunnable;
+import com.example.musicplayer.messageLoop.MusicLoader;
 import com.example.musicplayer.model.Music;
+import com.example.musicplayer.repository.MusicRepository;
+import com.example.musicplayer.storage.SharePref;
+import com.example.musicplayer.utils.SeekBarRunnable;
 
 import java.util.List;
 
 
 public class MusicPlayerViewModel extends AndroidViewModel {
+    public static final String BASE_URI_ALBUM_ART =
+            "content://media/external/audio/albumart";
     private Music mMusic;
     private MediaPlayer mMediaPlayer;
     private SeekBarRunnable mSeekBarRunnable;
-    private MusicLoader<MusicAdapter.Holder> mMusicLoader;
+    private MusicLoader<MusicPlayerViewModel> mMusicLoader;
+
+    private String mCurrentPath = SharePref.getLastMusicPath(getApplication());
 
     public final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -38,6 +42,8 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
     public MusicPlayerViewModel(@NonNull Application application) {
         super(application);
+
+        setupLooper();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -54,56 +60,74 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         return MusicRepository.getMusics(getApplication());
     }
 
-    public Music getMusic() {
-        return mMusic;
-    }
-
-    public void setMusic(Music music) {
-        mMusic = music;
-    }
-
-    public void setSeekBarRunnable(SeekBar seekBar){
-        mSeekBarRunnable=new SeekBarRunnable(mMediaPlayer,seekBar);
-    }
-    public MediaPlayer getMediaPlayer() {
-        return mMediaPlayer;
-    }
-
-    public MusicLoader<MusicAdapter.Holder> getMusicLoader() {
-        return mMusicLoader;
-    }
-
     /**
      * this method check {@music.isPlaying()} if music playing , pause music else play music
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void checkPlayPauseMusic(){
-            mMediaPlayer = mMusic.getMediaPlayer();
-        if (!mMusic.isPlaying()){
+        if (!mMusic.isPlaying()) {
             mMusic.setPlaying(true);
-            mMediaPlayer.start();
+
+            if (!mCurrentPath.equals(mMusic.getPath()) || mMediaPlayer == null) {
+                mCurrentPath = mMusic.getPath();
+                mMusicLoader.setCallbacks(new MusicLoader.MusicLoaderCallback<MusicPlayerViewModel>() {
+                    @Override
+                    public void onMusicLoader(MusicPlayerViewModel target, MediaPlayer mediaPlayer) {
+                        mMediaPlayer = mediaPlayer;
+                        mMediaPlayer.start();
+                    }
+                });
+
+                mMusicLoader.createMessage(this, mMusic.getPath());
+            } else {
+                mMediaPlayer.start();
+            }
+
+            // for according to seek bar
             new Thread(mSeekBarRunnable).start();
-        }else {
+        } else {
             mMediaPlayer.pause();
             mMusic.setPlaying(false);
         }
     }
 
-    public void releaseMediaPlayer(){
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void checkPlayPauseMusic(Music music) {
+        if (!music.isPlaying()) {
+            music.setPlaying(true);
+
+            if (!mCurrentPath.equals(music.getPath()) || mMediaPlayer == null) {
+                mCurrentPath = music.getPath();
+                mMusicLoader.setCallbacks(new MusicLoader.MusicLoaderCallback<MusicPlayerViewModel>() {
+                    @Override
+                    public void onMusicLoader(MusicPlayerViewModel target, MediaPlayer mediaPlayer) {
+                        mMediaPlayer = mediaPlayer;
+                        mMediaPlayer.start();
+                    }
+                });
+
+                mMusicLoader.createMessage(this, mMusic.getPath());
+            } else {
+                mMediaPlayer.start();
+            }
+
+            // for according to seek bar
+            new Thread(mSeekBarRunnable).start();
+        } else {
+            mMediaPlayer.pause();
+            music.setPlaying(false);
+        }
+    }
+
+    public void releaseMediaPlayer() {
         if (mMediaPlayer != null)
             mMediaPlayer.release();
     }
 
     public void setupLooper() {
-        mMusicLoader=new MusicLoader<>();
+        mMusicLoader = new MusicLoader<>();
         mMusicLoader.start();
         mMusicLoader.getLooper();
-        mMusicLoader.setCallbacks(new MusicLoader.MusicLoaderCallback<MusicAdapter.Holder>() {
-            @Override
-            public void onMusicLoader(MusicAdapter.Holder target, MediaPlayer path) {
-                target.bindMediaPlayer(path);
-            }
-        });
     }
 
     public String getNormalText(String text,int textLength) {
@@ -124,16 +148,35 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         return minute + " : " + second%60;
     }
 
-    public void setCoverImg(int albumId, ImageView view){
+    public void setCoverImg(int albumId, ImageView view) {
         Uri sArtworkUri = Uri
-                .parse("content://media/external/audio/albumart");
-        Uri uri= ContentUris.withAppendedId(sArtworkUri,albumId);
+                .parse(BASE_URI_ALBUM_ART);
+        Uri uri = ContentUris.withAppendedId(sArtworkUri, albumId);
 
         Glide.with(getApplication()).
                 load(uri).
                 centerCrop().
                 placeholder(R.drawable.ic_null_cover_img).
                 into(view);
+    }
 
+    public Music getMusic() {
+        return mMusic;
+    }
+
+    public void setMusic(Music music) {
+        mMusic = music;
+    }
+
+    public void setSeekBarRunnable(SeekBar seekBar) {
+        mSeekBarRunnable = new SeekBarRunnable(mMediaPlayer, seekBar);
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mMediaPlayer;
+    }
+
+    public MusicLoader<MusicPlayerViewModel> getMusicLoader() {
+        return mMusicLoader;
     }
 }
