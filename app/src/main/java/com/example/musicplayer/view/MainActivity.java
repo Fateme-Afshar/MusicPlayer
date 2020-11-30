@@ -1,12 +1,11 @@
-package com.example.musicplayer.View;
+package com.example.musicplayer.view;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.musicplayer.R;
-import com.example.musicplayer.View.Fragment.BottomSheetFragment;
-import com.example.musicplayer.View.Fragment.PagerFragment;
-import com.example.musicplayer.View.Fragment.SongsFragment;
-import com.example.musicplayer.databinding.FragmentBottomSheetBinding;
+import com.example.musicplayer.view.fragment.BottomSheetFragment;
+import com.example.musicplayer.view.fragment.PagerFragment;
+import com.example.musicplayer.view.fragment.SongsFragment;
 
 public class MainActivity extends SingleFragmentActivity
         implements SongsFragment.SongsFragmentCallbacks {

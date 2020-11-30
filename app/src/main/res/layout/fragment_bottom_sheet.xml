@@ -7,6 +7,10 @@
         <variable
             name="viewModel"
             type="com.example.musicplayer.viewModel.MusicPlayerViewModel" />
+
+        <variable
+            name="fragment"
+            type="com.example.musicplayer.view.fragment.BottomSheetFragment" />
     </data>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -47,7 +51,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginBottom="@dimen/margin_10"
                 android:visibility="@{viewModel.music.isPlaying ? View.INVISIBLE : View.VISIBLE}"
-                android:onClick="@{()->viewModel.checkPlayPauseMusic()}"
+                android:onClick="@{()->viewModel.checkPlayPauseMusic()+fragment.setupVisibility()}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -59,7 +63,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginBottom="@dimen/margin_10"
                 android:visibility="@{viewModel.music.isPlaying ? View.VISIBLE : View.INVISIBLE}"
-                android:onClick="@{()->viewModel.checkPlayPauseMusic()}"
+                android:onClick="@{()->viewModel.checkPlayPauseMusic()+fragment.setupVisibility()}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView

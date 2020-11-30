@@ -1,4 +1,4 @@
-package com.example.musicplayer.View.Fragment;
+package com.example.musicplayer.view.fragment;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -92,7 +92,7 @@ public class SongsFragment extends Fragment {
                 false);
         setupBottomSheet();
         setupAdapter();
-
+        mBinding.setFragment(SongsFragment.this);
         return mBinding.getRoot();
     }
 
@@ -189,11 +189,15 @@ public class SongsFragment extends Fragment {
         }
     }
 
-    private void updateBottomNavUI() {
+    public void updateBottomNavUI() {
         mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
                 mBinding.imgCoverFooter);
         mBinding.setViewModel(mViewModel);
 
+        setupVisibility();
+    }
+
+    public void setupVisibility() {
         if (mViewModel.getMusic().isPlaying()) {
             mBinding.btnPlayBottomSheet.setVisibility(View.GONE);
             mBinding.btnPauseBottomSheet.setVisibility(View.VISIBLE);

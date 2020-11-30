@@ -4,7 +4,6 @@
 
     <data>
         <import type="android.view.View"/>
-        <import type="com.example.musicplayer.R"/>
         <variable
             name="view"
             type="View" />
@@ -14,6 +13,7 @@
         <variable
             name="viewModel"
             type="com.example.musicplayer.viewModel.MusicPlayerViewModel" />
+
     </data>
 
     <RelativeLayout

@@ -5,9 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.musicplayer.View.Fragment.AlbumsFragment;
-import com.example.musicplayer.View.Fragment.SingersFragment;
-import com.example.musicplayer.View.Fragment.SongsFragment;
+import com.example.musicplayer.view.fragment.AlbumsFragment;
+import com.example.musicplayer.view.fragment.SingersFragment;
+import com.example.musicplayer.view.fragment.SongsFragment;
 
 public class MusicPagerAdapter extends FragmentStateAdapter {
 

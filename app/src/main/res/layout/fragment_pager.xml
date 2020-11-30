@@ -5,7 +5,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".View.Fragment.PagerFragment">
+        tools:context=".view.fragment.PagerFragment">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"

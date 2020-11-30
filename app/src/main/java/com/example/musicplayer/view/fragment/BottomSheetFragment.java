@@ -1,4 +1,4 @@
-package com.example.musicplayer.View.Fragment;
+package com.example.musicplayer.view.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -51,6 +51,7 @@ public class BottomSheetFragment extends Fragment {
         mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
                 mBinding.imgCoverBottomSheet);
         mBinding.setViewModel(mViewModel);
+        mBinding.setFragment(this);
         setupSeekBar();
         return mBinding.getRoot();
     }
@@ -83,5 +84,15 @@ public class BottomSheetFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public void setupVisibility() {
+        if (mViewModel.getMusic().isPlaying()) {
+            mBinding.btnPlay.setVisibility(View.GONE);
+            mBinding.btnPause.setVisibility(View.VISIBLE);
+        } else {
+            mBinding.btnPlay.setVisibility(View.VISIBLE);
+            mBinding.btnPause.setVisibility(View.GONE);
+        }
     }
 }

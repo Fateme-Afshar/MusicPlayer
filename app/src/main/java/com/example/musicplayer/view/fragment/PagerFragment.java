@@ -1,4 +1,4 @@
-package com.example.musicplayer.View.Fragment;
+package com.example.musicplayer.view.fragment;
 
 import android.app.ActivityManager;
 import android.content.Context;

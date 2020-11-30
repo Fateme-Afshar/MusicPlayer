@@ -11,6 +11,10 @@
             name="viewModel"
             type="com.example.musicplayer.viewModel.MusicPlayerViewModel" />
 
+        <variable
+            name="fragment"
+            type="com.example.musicplayer.view.fragment.SongsFragment" />
+
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -98,7 +102,7 @@
             app:layout_anchor="@+id/btn_pause_bottom_sheet"
             app:layout_anchorGravity="center"
             android:visibility="@{viewModel.music.isPlaying() ? View.GONE : View.VISIBLE}"
-            android:onClick="@{()->viewModel.checkPlayPauseMusic()}"
+            android:onClick="@{()->viewModel.checkPlayPauseMusic()+fragment.setupVisibility()}"
             />
 
         <ImageView
@@ -109,7 +113,7 @@
             android:layout_margin="10dp"
             android:src="@drawable/ic_pause"
             android:visibility="@{viewModel.music.isPlaying() ? View.VISIBLE : View.GONE}"
-            android:onClick="@{()->viewModel.checkPlayPauseMusic()}"
+            android:onClick="@{()->viewModel.checkPlayPauseMusic()+fragment.setupVisibility()}"
             />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
