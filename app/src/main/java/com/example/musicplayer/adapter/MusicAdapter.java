@@ -21,12 +21,14 @@ import com.example.musicplayer.storage.SharePref;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> implements Filterable {
-    private final List<Music> mMusicList = new ArrayList<>();
+    private final Map<Integer, Music> mMusicList = new HashMap<>();
 
-    private  List<Music> mSearchResults;
+    private Map<Integer, Music> mSearchResults;
 
     private Context mContext;
 
@@ -42,18 +44,18 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
         mCallback = callback;
     }
 
-    public List<Music> getMusicNameList() {
+    public Map<Integer, Music> getMusics() {
         return mMusicList;
     }
 
-    public void setMusicNameList(List<Music> musicList) {
-        mMusicList.addAll(musicList);
-        mSearchResults=new ArrayList<>(musicList);
+    public void setMusicNameList(Map<Integer, Music> musicList) {
+        mMusicList.putAll(musicList);
+        mSearchResults = new HashMap<>(musicList);
     }
 
     public MusicAdapter(Context context, MusicPlayerViewModel viewModel) {
         mContext = context.getApplicationContext();
-        mViewModel=viewModel;
+        mViewModel = viewModel;
     }
 
 
@@ -81,6 +83,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
             public void onClick(View v) {
                 mCallback.sendMusicInfo(music, position);
                 mViewModel.setMusic(music);
+                mViewModel.setPosition(position);
                 SharePref.setLastMusicPath(mContext, music.getPath());
                 mViewModel.checkPlayPauseMusic();
                 }
@@ -118,17 +121,18 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
     private Filter mFilter=new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            List<Music> filterList=new ArrayList<>();
+            Map<Integer, Music> filterList = new HashMap<>();
 
             if (constraint==null || constraint.length()==0)
-                filterList.addAll(mSearchResults);
+                filterList.putAll(mSearchResults);
             else {
-                String pattern=constraint.toString().toLowerCase().trim();
+                String pattern = constraint.toString().toLowerCase().trim();
 
-                for (Music music : mSearchResults) {
+                for (int i = 0; i < mMusicList.size(); i++) {
+                    Music music = mMusicList.get(i);
                     if (music.getName().contains(pattern) ||
                             music.getSingerName().contains(pattern))
-                        filterList.add(music);
+                        filterList.put(i, music);
                 }
             }
 
@@ -139,7 +143,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             mMusicList.clear();
-            mMusicList.addAll((List<Music>) results.values);
+            mMusicList.putAll((Map<? extends Integer, ? extends Music>) results.values);
             notifyDataSetChanged();
         }
     };

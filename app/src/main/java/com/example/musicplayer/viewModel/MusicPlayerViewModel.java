@@ -23,6 +23,7 @@ import com.example.musicplayer.storage.SharePref;
 import com.example.musicplayer.utils.SeekBarRunnable;
 
 import java.util.List;
+import java.util.Map;
 
 
 public class MusicPlayerViewModel extends AndroidViewModel {
@@ -33,7 +34,11 @@ public class MusicPlayerViewModel extends AndroidViewModel {
     private SeekBarRunnable mSeekBarRunnable;
     private MusicLoader<MusicPlayerViewModel> mMusicLoader;
 
+    private boolean mIsShuffle=false;
+    private boolean mIsRepeat=false;
+
     private String mCurrentPath = SharePref.getLastMusicPath(getApplication());
+    private int mPosition;
 
     public final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE
@@ -52,11 +57,12 @@ public class MusicPlayerViewModel extends AndroidViewModel {
             if (getApplication().checkSelfPermission(PERMISSIONS[i]) != PackageManager.PERMISSION_GRANTED)
                 return true;
         }
+
         return false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public List<Music> getMusics(){
+    public Map<Integer, Music> getMusics(){
         return MusicRepository.getMusics(getApplication());
     }
 
@@ -70,6 +76,9 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
             if (!mCurrentPath.equals(mMusic.getPath()) || mMediaPlayer == null) {
                 mCurrentPath = mMusic.getPath();
+                if (mMediaPlayer!=null)
+                    mMediaPlayer.stop();
+
                 mMusicLoader.setCallbacks(new MusicLoader.MusicLoaderCallback<MusicPlayerViewModel>() {
                     @Override
                     public void onMusicLoader(MusicPlayerViewModel target, MediaPlayer mediaPlayer) {
@@ -91,6 +100,10 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * this is overload from {@checkPlayPauseMusic()}.
+     * @param music
+     */
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void checkPlayPauseMusic(Music music) {
         if (!music.isPlaying()) {
@@ -98,6 +111,8 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
             if (!mCurrentPath.equals(music.getPath()) || mMediaPlayer == null) {
                 mCurrentPath = music.getPath();
+                if (mMediaPlayer!=null)
+                    mMediaPlayer.stop();
                 mMusicLoader.setCallbacks(new MusicLoader.MusicLoaderCallback<MusicPlayerViewModel>() {
                     @Override
                     public void onMusicLoader(MusicPlayerViewModel target, MediaPlayer mediaPlayer) {
@@ -138,6 +153,45 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         return text;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void playPrevMusic() {
+        mPosition--;
+        if (mPosition>=0 && mPosition<=getMusics().size()-1){
+            mMusic=getMusics().get(mPosition-1);
+        }else {
+            mMusic=getMusics().get(0);
+        }
+        checkPlayPauseMusic(mMusic);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void playNextMusic() {
+        if (mPosition>=0 && mPosition<=getMusics().size()-1){
+            mMusic=getMusics().get(mPosition+1);
+            mPosition++;
+        }else {
+            mMusic=getMusics().get(getMusics().size()-1);
+        }
+        checkPlayPauseMusic(mMusic);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void playShuffleMusic(){
+        int randomPosition=randomPosition(getMusics().size()-1,0);
+        mMusic=getMusics().get(randomPosition);
+    }
+
+    public void autoNextMusicPlay() {
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @RequiresApi(api = Build.VERSION_CODES.Q)
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                playNextMusic();
+                checkPlayPauseMusic();
+            }
+        });
+    }
+    
     public String extractMusicDurationToTimeFormat(int musicDuration) {
         int second = (musicDuration/1000);
         int minute = second / 60;
@@ -178,5 +232,34 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
     public MusicLoader<MusicPlayerViewModel> getMusicLoader() {
         return mMusicLoader;
+    }
+
+    public int getPosition() {
+        return mPosition;
+    }
+
+    public void setPosition(int position) {
+        mPosition = position;
+    }
+
+    public boolean isShuffle() {
+        return mIsShuffle;
+    }
+
+    public void setShuffle(boolean shuffle) {
+        mIsShuffle = shuffle;
+    }
+
+    public boolean isRepeat() {
+        return mIsRepeat;
+    }
+
+    public void setRepeat(boolean repeat) {
+        mIsRepeat = repeat;
+    }
+
+    public int randomPosition(int max,int min){
+        int range = max - min + 1;
+        return (int)(Math.random() * range) + min;
     }
 }

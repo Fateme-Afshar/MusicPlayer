@@ -145,7 +145,7 @@ public class SongsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (mAdapter.getMusicNameList().size() == 0)
+        if (mAdapter.getMusics().size() == 0)
             mAdapter.setMusicNameList(mViewModel.getMusics());
 
         setupLastMusicShow();

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View"/>
+        <import type="com.example.musicplayer.R"/>
+
         <variable
             name="viewModel"
             type="com.example.musicplayer.viewModel.MusicPlayerViewModel" />
@@ -63,7 +64,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginBottom="@dimen/margin_10"
                 android:visibility="@{viewModel.music.isPlaying ? View.VISIBLE : View.INVISIBLE}"
-                android:onClick="@{()->viewModel.checkPlayPauseMusic()+fragment.setupVisibility()}"
+                android:onClick="@{()->viewModel.checkPlayPauseMusic()+fragment.setupSeekBar()+fragment.setupVisibility()}"
                 />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -76,6 +77,7 @@
                 android:layout_marginLeft="62dp"
                 android:layout_marginTop="@dimen/margin_5"
                 android:layout_marginBottom="@dimen/margin_10"
+                android:onClick="@{()->viewModel.playNextMusic()}"
                 android:src="@drawable/ic_next"
                 />
 
@@ -89,8 +91,29 @@
                 android:layout_marginTop="@dimen/margin_5"
                 android:layout_marginRight="62dp"
                 android:layout_marginBottom="@dimen/margin_10"
+                android:onClick="@{()->viewModel.playPrevMusic()}"
                 android:src="@drawable/ic_prev" />
 
         </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_shuffle"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@+id/music_progress_view_group"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            tools:src="@drawable/ic_shuffle_yellow"
+            android:src="@{viewModel.shuffle ? R.drawable.ic_shuffle_red : R.drawable.ic_shuffle_yellow}"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_repeat"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@+id/music_progress_view_group"
+            android:layout_margin="10dp"
+            android:src="@{viewModel.repeat ? R.drawable.ic_repeat_red : R.drawable.ic_repeat_yellow}"
+            tools:src="@drawable/ic_repeat_yellow" />
     </RelativeLayout>
 </layout>

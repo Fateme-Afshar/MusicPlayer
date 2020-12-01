@@ -12,19 +12,21 @@ import androidx.annotation.RequiresApi;
 import com.example.musicplayer.model.Music;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MusicRepository {
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public static List<Music> getMusics(Context context) {
+    public static Map<Integer,Music> getMusics(Context context) {
         Context leakSafeContext = context.getApplicationContext();
-        List<Music> musicList = new ArrayList<>();
+        Map<Integer,Music> musicList = new HashMap<>();
 
         Cursor songCursorEXTERNAL = getCursor(leakSafeContext);
 
         if (songCursorEXTERNAL != null) {
-            musicList.addAll(getInfoFromCursor(songCursorEXTERNAL));
+            musicList.putAll(getInfoFromCursor(songCursorEXTERNAL));
         }
 
         songCursorEXTERNAL.close();
@@ -32,14 +34,15 @@ public class MusicRepository {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private static List<Music> getInfoFromCursor(Cursor cursor) {
-        List<Music> musicList = new ArrayList<>();
+    private static Map<Integer,Music> getInfoFromCursor(Cursor cursor) {
+        Map<Integer,Music> musicList = new HashMap<>();
         cursor.moveToNext();
-
+        int counter=0;
         while (cursor.moveToNext()) {
             Music music = getMusic(cursor);
 
-            musicList.add(music);
+            musicList.put(counter,music);
+            counter++;
         }
 
         return musicList;

@@ -20,7 +20,6 @@
         android:id="@+id/item_music"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         >
 
         <ImageView
@@ -29,6 +28,7 @@
             android:layout_height="80dp"
             android:layout_margin="5dp"
             android:background="@drawable/shadow"
+            android:src="@drawable/ic_null_cover_img"
             />
 
         <com.google.android.material.textview.MaterialTextView

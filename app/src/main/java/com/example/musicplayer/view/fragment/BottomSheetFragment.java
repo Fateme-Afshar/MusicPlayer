@@ -1,23 +1,30 @@
 package com.example.musicplayer.view.fragment;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
+import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.musicplayer.R;
-import com.example.musicplayer.utils.SeekBarRunnable;
 import com.example.musicplayer.databinding.FragmentBottomSheetBinding;
+import com.example.musicplayer.model.Music;
+import com.example.musicplayer.utils.SeekBarRunnable;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BottomSheetFragment extends Fragment {
     private MusicPlayerViewModel mViewModel;
     private FragmentBottomSheetBinding mBinding;
+    private final Map<Integer, Music> mMusics=new HashMap<>();
 
     public BottomSheetFragment() {
         // Required empty public constructor
@@ -30,6 +37,7 @@ public class BottomSheetFragment extends Fragment {
         return fragment;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +45,8 @@ public class BottomSheetFragment extends Fragment {
         mViewModel = new ViewModelProvider(getActivity()).
                 get(MusicPlayerViewModel.class);
 
+        mMusics.putAll(mViewModel.getMusics());
+        int musicPosition = mViewModel.getPosition();
     }
 
     @Override
@@ -56,7 +66,8 @@ public class BottomSheetFragment extends Fragment {
         return mBinding.getRoot();
     }
 
-    private void setupSeekBar() {
+    public void setupSeekBar() {
+
         SeekBarRunnable seekBarRunnable =
                 new SeekBarRunnable(mViewModel.getMediaPlayer(), mBinding.seekbar);
 
