@@ -13,6 +13,7 @@ import android.widget.SeekBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 
 import com.bumptech.glide.Glide;
 import com.example.musicplayer.R;
@@ -22,7 +23,6 @@ import com.example.musicplayer.repository.MusicRepository;
 import com.example.musicplayer.storage.SharePref;
 import com.example.musicplayer.utils.SeekBarRunnable;
 
-import java.util.List;
 import java.util.Map;
 
 
@@ -34,8 +34,11 @@ public class MusicPlayerViewModel extends AndroidViewModel {
     private SeekBarRunnable mSeekBarRunnable;
     private MusicLoader<MusicPlayerViewModel> mMusicLoader;
 
-    private boolean mIsShuffle=false;
-    private boolean mIsRepeat=false;
+    private MutableLiveData<Music> mMusicLiveData = new MutableLiveData<>();
+    private MutableLiveData<MediaPlayer> mMediaPlayerLiveData = new MutableLiveData<>();
+
+    private boolean mIsShuffle = false;
+    private boolean mIsRepeat = false;
 
     private String mCurrentPath = SharePref.getLastMusicPath(getApplication());
     private int mPosition;
@@ -57,7 +60,6 @@ public class MusicPlayerViewModel extends AndroidViewModel {
             if (getApplication().checkSelfPermission(PERMISSIONS[i]) != PackageManager.PERMISSION_GRANTED)
                 return true;
         }
-
         return false;
     }
 
@@ -83,6 +85,7 @@ public class MusicPlayerViewModel extends AndroidViewModel {
                     @Override
                     public void onMusicLoader(MusicPlayerViewModel target, MediaPlayer mediaPlayer) {
                         mMediaPlayer = mediaPlayer;
+                        mMediaPlayerLiveData.postValue(mediaPlayer);
                         mMediaPlayer.start();
                     }
                 });
@@ -157,36 +160,60 @@ public class MusicPlayerViewModel extends AndroidViewModel {
     public void playPrevMusic() {
         mPosition--;
         if (mPosition>=0 && mPosition<=getMusics().size()-1){
-            mMusic=getMusics().get(mPosition-1);
+            setMusic(getMusics().get(mPosition - 1));
         }else {
-            mMusic=getMusics().get(0);
+            setMusic(getMusics().get(0));
         }
-        checkPlayPauseMusic(mMusic);
+        checkPlayPauseMusic();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public void playNextMusic() {
-        if (mPosition>=0 && mPosition<=getMusics().size()-1){
-            mMusic=getMusics().get(mPosition+1);
+        if (mPosition >= 0 && mPosition <= getMusics().size() - 1) {
+            setMusic(getMusics().get(mPosition + 1));
             mPosition++;
-        }else {
-            mMusic=getMusics().get(getMusics().size()-1);
+        } else {
+            setMusic(getMusics().get(0));
         }
-        checkPlayPauseMusic(mMusic);
+        checkPlayPauseMusic();
+    }
+
+    public SeekBarRunnable getSeekBarRunnable() {
+        return mSeekBarRunnable;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public void playShuffleMusic(){
-        int randomPosition=randomPosition(getMusics().size()-1,0);
-        mMusic=getMusics().get(randomPosition);
+    public void playShuffleMusic() {
+        mIsShuffle = true;
+        int randomPosition = randomPosition(getMusics().size() - 1, 0);
+        setMusic(getMusics().get(randomPosition));
+
+        checkPlayPauseMusic();
+
     }
 
-    public void autoNextMusicPlay() {
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void repeatMusic() {
+        if (mIsRepeat) {
+            mIsRepeat = false;
+            mMediaPlayer.setLooping(false);
+        } else {
+            mMediaPlayer.setLooping(true);
+        }
+    }
+
+    public void autoPlayMusic() {
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onCompletion(MediaPlayer mp) {
-                playNextMusic();
+                if (isShuffle()) {
+                    playShuffleMusic();
+                } else if (isRepeat()) {
+                    repeatMusic();
+                } else {
+                    playNextMusic();
+                }
                 checkPlayPauseMusic();
             }
         });
@@ -220,6 +247,15 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
     public void setMusic(Music music) {
         mMusic = music;
+        mMusicLiveData.postValue(music);
+    }
+
+    public MutableLiveData<Music> getMusicLiveData() {
+        return mMusicLiveData;
+    }
+
+    public MutableLiveData<MediaPlayer> getMediaPlayerLiveData() {
+        return mMediaPlayerLiveData;
     }
 
     public void setSeekBarRunnable(SeekBar seekBar) {

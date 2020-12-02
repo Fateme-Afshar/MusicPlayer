@@ -11,13 +11,16 @@ import androidx.annotation.RequiresApi;
 
 import com.example.musicplayer.model.Music;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MusicRepository {
 
+    /**
+     * get music list from ExternalStorage
+     * @param context
+     * @return
+     */
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static Map<Integer,Music> getMusics(Context context) {
         Context leakSafeContext = context.getApplicationContext();
@@ -27,12 +30,16 @@ public class MusicRepository {
 
         if (songCursorEXTERNAL != null) {
             musicList.putAll(getInfoFromCursor(songCursorEXTERNAL));
+            songCursorEXTERNAL.close();
         }
-
-        songCursorEXTERNAL.close();
         return musicList;
     }
 
+    /**
+     * Extract music list from cursor
+     * @param cursor
+     * @return
+     */
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private static Map<Integer,Music> getInfoFromCursor(Cursor cursor) {
         Map<Integer,Music> musicList = new HashMap<>();
@@ -41,26 +48,39 @@ public class MusicRepository {
         while (cursor.moveToNext()) {
             Music music = getMusic(cursor);
 
-            musicList.put(counter,music);
+            musicList.put(counter, music);
             counter++;
         }
 
         return musicList;
     }
 
+    /**
+     * get cursor without any selection,selection args and etc.
+     * this is default cursor for songUriFromEXTERNAL.
+     *
+     * @param leakSafeContext
+     * @return
+     */
     public static Cursor getCursor(Context leakSafeContext) {
-        Uri mSongUriFromEXTERNAL =
+        Uri songUriFromEXTERNAL =
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         ContentResolver contentResolver = leakSafeContext.getContentResolver();
 
         return contentResolver.
-                query(mSongUriFromEXTERNAL,
+                query(songUriFromEXTERNAL,
                         null,
                         null,
                         null,
                         null);
     }
 
+    /**
+     * Query for specific music by path
+     * @param leakSafeContext
+     * @param path
+     * @return
+     */
     public static Cursor getCursor(Context leakSafeContext, String path) {
         Uri mSongUriFromEXTERNAL =
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -74,6 +94,11 @@ public class MusicRepository {
                         null);
     }
 
+    /**
+     * Extract music information  from cursor
+     * @param cursor
+     * @return
+     */
     public static Music getMusic(Cursor cursor) {
         int songName = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
         int songSingerName = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
@@ -86,6 +111,12 @@ public class MusicRepository {
                 , cursor.getInt(albumId));
     }
 
+    /**
+     * Extract specific music information from cursor.
+     * @param context
+     * @param path
+     * @return
+     */
     public static Music getMusic(Context context,String path) {
         Cursor cursor=getCursor(context,path);
         cursor.moveToFirst();
@@ -93,8 +124,7 @@ public class MusicRepository {
         int songSingerName = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
         int songPath = cursor.getColumnIndex(MediaStore.Audio.Media.DATA);
         int albumId = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-        if (cursor == null)
-            return null;
+
         try {
             return new Music(cursor.getString(songName)
                     , cursor.getString(songSingerName)

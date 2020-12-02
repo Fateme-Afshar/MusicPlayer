@@ -1,5 +1,6 @@
 package com.example.musicplayer.view.fragment;
 
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,11 +11,13 @@ import android.widget.SeekBar;
 import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.musicplayer.R;
 import com.example.musicplayer.databinding.FragmentBottomSheetBinding;
 import com.example.musicplayer.model.Music;
+import com.example.musicplayer.storage.SharePref;
 import com.example.musicplayer.utils.SeekBarRunnable;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
 
@@ -24,7 +27,6 @@ import java.util.Map;
 public class BottomSheetFragment extends Fragment {
     private MusicPlayerViewModel mViewModel;
     private FragmentBottomSheetBinding mBinding;
-    private final Map<Integer, Music> mMusics=new HashMap<>();
 
     public BottomSheetFragment() {
         // Required empty public constructor
@@ -45,8 +47,26 @@ public class BottomSheetFragment extends Fragment {
         mViewModel = new ViewModelProvider(getActivity()).
                 get(MusicPlayerViewModel.class);
 
-        mMusics.putAll(mViewModel.getMusics());
-        int musicPosition = mViewModel.getPosition();
+        mViewModel.getMusicLiveData().observe(this, new Observer<Music>() {
+            @Override
+            public void onChanged(Music music) {
+                mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
+                        mBinding.imgCoverBottomSheet);
+                mBinding.setViewModel(mViewModel);
+                mBinding.notifyChange();
+
+                SharePref.setLastMusicPath(getContext(),music.getPath());
+
+                setupSeekBar();
+            }
+        });
+
+        mViewModel.getMediaPlayerLiveData().observe(this, new Observer<MediaPlayer>() {
+            @Override
+            public void onChanged(MediaPlayer mediaPlayer) {
+                mViewModel.autoPlayMusic();
+            }
+        });
     }
 
     @Override

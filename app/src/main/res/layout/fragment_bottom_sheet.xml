@@ -19,7 +19,7 @@
         android:background="#fff"
         >
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/img_cover_bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -100,20 +100,22 @@
             android:id="@+id/btn_shuffle"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_above="@+id/music_progress_view_group"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_margin="10dp"
+            android:layout_margin="@dimen/margin_10"
+            android:onClick="@{()->viewModel.playShuffleMusic()}"
             tools:src="@drawable/ic_shuffle_yellow"
-            android:src="@{viewModel.shuffle ? R.drawable.ic_shuffle_red : R.drawable.ic_shuffle_yellow}"
+            android:src="@{viewModel.shuffle ? R.drawable.ic_shuffle_yellow : R.drawable.ic_shuffle_red}"
             />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_repeat"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_above="@+id/music_progress_view_group"
-            android:layout_margin="10dp"
-            android:src="@{viewModel.repeat ? R.drawable.ic_repeat_red : R.drawable.ic_repeat_yellow}"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="@dimen/margin_10"
+            android:onClick="@{()->viewModel.repeatMusic()}"
+            android:src="@{viewModel.repeat ? R.drawable.ic_repeat_yellow : R.drawable.ic_repeat_red}"
             tools:src="@drawable/ic_repeat_yellow" />
     </RelativeLayout>
 </layout>

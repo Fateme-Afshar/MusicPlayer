@@ -1,6 +1,7 @@
 package com.example.musicplayer.view.fragment;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -67,7 +69,24 @@ public class SongsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(getActivity()).
                 get(MusicPlayerViewModel.class);
+        mViewModel.getMusicLiveData().observe(this, new Observer<Music>() {
+            @Override
+            public void onChanged(Music music) {
+                mViewModel.setCoverImg(mViewModel.getMusic().getAlbumId(),
+                        mBinding.imgCoverFooter);
+                mBinding.setViewModel(mViewModel);
+                mBinding.notifyChange();
 
+                SharePref.setLastMusicPath(getContext(),music.getPath());
+            }
+        });
+
+        mViewModel.getMediaPlayerLiveData().observe(this, new Observer<MediaPlayer>() {
+            @Override
+            public void onChanged(MediaPlayer mediaPlayer) {
+                mViewModel.autoPlayMusic();
+            }
+        });
         setHasOptionsMenu(true);
     }
 
