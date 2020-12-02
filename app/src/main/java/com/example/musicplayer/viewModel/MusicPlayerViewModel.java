@@ -158,9 +158,9 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public void playPrevMusic() {
-        mPosition--;
         if (mPosition>=0 && mPosition<=getMusics().size()-1){
             setMusic(getMusics().get(mPosition - 1));
+            mPosition--;
         }else {
             setMusic(getMusics().get(0));
         }
