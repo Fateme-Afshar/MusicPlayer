@@ -60,13 +60,6 @@ public class BottomSheetFragment extends Fragment {
                 setupSeekBar();
             }
         });
-
-        mViewModel.getMediaPlayerLiveData().observe(this, new Observer<MediaPlayer>() {
-            @Override
-            public void onChanged(MediaPlayer mediaPlayer) {
-                mViewModel.autoPlayMusic();
-            }
-        });
     }
 
     @Override

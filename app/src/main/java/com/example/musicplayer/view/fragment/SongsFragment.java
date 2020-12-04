@@ -1,7 +1,9 @@
 package com.example.musicplayer.view.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.media.MediaPlayer;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -23,13 +25,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.musicplayer.adapter.MusicAdapter;
 import com.example.musicplayer.R;
 import com.example.musicplayer.repository.MusicRepository;
+import com.example.musicplayer.notification.CreateNotification;
+import com.example.musicplayer.service.NotificationActionBroadCast;
+import com.example.musicplayer.service.OnClearFromRecentService;
 import com.example.musicplayer.storage.SharePref;
 import com.example.musicplayer.databinding.MainViewBinding;
 import com.example.musicplayer.model.Music;
 import com.example.musicplayer.viewModel.MusicPlayerViewModel;
+import com.example.musicplayer.viewModel.Playable;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-public class SongsFragment extends Fragment {
+public class SongsFragment extends Fragment implements Playable {
     public static final String DEFAULT_MUSIC_PATH =
             "/storage/6507-0AD9/1212/02 - Delam Havato Kardeh.mp3";
 
@@ -81,12 +87,10 @@ public class SongsFragment extends Fragment {
             }
         });
 
-        mViewModel.getMediaPlayerLiveData().observe(this, new Observer<MediaPlayer>() {
-            @Override
-            public void onChanged(MediaPlayer mediaPlayer) {
-                mViewModel.autoPlayMusic();
-            }
-        });
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            getActivity().registerReceiver(mBroadcastReceiver,new IntentFilter(NotificationActionBroadCast.MUSIC));
+            getActivity().startService(new Intent(getActivity().getBaseContext(), OnClearFromRecentService.class));
+        }
         setHasOptionsMenu(true);
     }
 
@@ -101,6 +105,22 @@ public class SongsFragment extends Fragment {
         setupBottomSheet();
         setupAdapter();
         mBinding.setFragment(SongsFragment.this);
+
+        /*mViewModel.getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @RequiresApi(api = Build.VERSION_CODES.Q)
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mp.stop();
+                if (mViewModel.isShuffle()) {
+                    mViewModel.playShuffleMusic();
+                } else if (mViewModel.isRepeat()) {
+                    mViewModel.repeatMusic();
+                } else {
+                    mViewModel.playNextMusic();
+                }
+                mViewModel.checkPlayPauseMusic();
+            }
+        });*/
         return mBinding.getRoot();
     }
 
@@ -164,10 +184,16 @@ public class SongsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (mAdapter.getMusics().size() == 0)
+        if (mAdapter.getMusics().size() == 0) {
             mAdapter.setMusicNameList(mViewModel.getMusics());
+        }
 
         setupLastMusicShow();
+        CreateNotification.createNotification(getContext(),
+                R.drawable.ic_play,
+                R.drawable.ic_play,
+                mViewModel.getMusics().size(),
+                mViewModel.getMusic());
     }
 
     private void setupLastMusicShow() {
@@ -193,15 +219,6 @@ public class SongsFragment extends Fragment {
         } else {
             mAdapter.notifyDataSetChanged();
         }
-
-        mAdapter.setCallback(new MusicAdapter.MusicAdapterCallback() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
-            @Override
-            public void sendMusicInfo(Music music,int position) {
-                mViewModel.setMusic(music);
-                updateBottomNavUI();
-            }
-        });
     }
 
     public void updateBottomNavUI() {
@@ -223,10 +240,80 @@ public class SongsFragment extends Fragment {
         }
     }
 
+    BroadcastReceiver mBroadcastReceiver=new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.Q)
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action=intent.getExtras().getString(NotificationActionBroadCast.ACTION_NAME);
+
+            switch (action){
+                case CreateNotification.ACTION_PERV:
+                    onMusicPrev();
+                    break;
+                case CreateNotification.ACTION_NEXT:
+                    onMusicNext();
+                    break;
+                case CreateNotification.ACTION_PLAY:
+                    if (mViewModel.getMusic().isPlaying()){
+                        onMusicPause();
+                    }else {
+                        onMusicPlay();
+                    }
+
+            }
+        }
+    };
     @Override
     public void onDestroy() {
         super.onDestroy();
         mViewModel.releaseMediaPlayer();
+
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    public void onMusicPrev() {
+            mViewModel.playPrevMusic();
+
+            CreateNotification.createNotification(getContext(),
+                    R.drawable.ic_play,
+                    mViewModel.getPosition(),
+                    mViewModel.getMusics().size(),
+                    mViewModel.getMusic());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onMusicPlay() {
+            mViewModel.checkPlayPauseMusic();
+        CreateNotification.createNotification(getContext(),
+                R.drawable.ic_play,
+                mViewModel.getPosition(),
+                mViewModel.getMusics().size(),
+                mViewModel.getMusic());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onMusicPause() {
+            mViewModel.checkPlayPauseMusic();
+        CreateNotification.createNotification(getContext(),
+                R.drawable.ic_play,
+                mViewModel.getPosition(),
+                mViewModel.getMusics().size(),
+                mViewModel.getMusic());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    public void onMusicNext() {
+            mViewModel.playNextMusic();
+        CreateNotification.createNotification(getContext(),
+                R.drawable.ic_play,
+                mViewModel.getPosition(),
+                mViewModel.getMusics().size(),
+                mViewModel.getMusic());
     }
 
     public interface SongsFragmentCallbacks {

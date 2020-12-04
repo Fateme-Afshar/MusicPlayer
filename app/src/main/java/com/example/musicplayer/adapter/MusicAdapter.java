@@ -81,10 +81,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Holder> impl
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCallback.sendMusicInfo(music, position);
                 mViewModel.setMusic(music);
+                mViewModel.getMusicLiveData().setValue(music);
                 mViewModel.setPosition(position);
-                SharePref.setLastMusicPath(mContext, music.getPath());
                 mViewModel.checkPlayPauseMusic();
                 }
         });

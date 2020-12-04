@@ -175,6 +175,7 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         } else {
             setMusic(getMusics().get(0));
         }
+
         checkPlayPauseMusic();
     }
 
@@ -187,9 +188,8 @@ public class MusicPlayerViewModel extends AndroidViewModel {
         mIsShuffle = true;
         int randomPosition = randomPosition(getMusics().size() - 1, 0);
         setMusic(getMusics().get(randomPosition));
-
+        mMusicLiveData.setValue(mMusic);
         checkPlayPauseMusic();
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -247,7 +247,6 @@ public class MusicPlayerViewModel extends AndroidViewModel {
 
     public void setMusic(Music music) {
         mMusic = music;
-        mMusicLiveData.postValue(music);
     }
 
     public MutableLiveData<Music> getMusicLiveData() {
